@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport({
   secure: false,
   auth: {
     user: "no-reply@noxirity.com",
-    pass: "39MpXUCo8c1Xsyj7mFX53MILKPL96",
+    pass: process.env.EMAIL_NOREPLY_PASS,
   },
   tls: {
     rejectUnauthorized: false,
