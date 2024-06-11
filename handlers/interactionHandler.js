@@ -2,20 +2,21 @@ require("dotenv").config();
 const { getFiles } = require("../util/functions");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-const { CLIENT_ID, GUILD_ID } = require("../util/config.json");
+const { CLIENT_ID, DEV_CLIENT_ID } = require("../util/config.json");
 const path = require("path");
 const fs = require("fs");
 
 module.exports = (client) => {
   const commandArray = [];
   const guildCommandArrays = {};
+  const isDevMode = process.argv.includes('dev');
+
   //! Slash Command Files.
 
   const slashCommandFiles = getFiles("./Interactions/slashCommands");
   for (const slashCommand of slashCommandFiles) {
     const absoluteSlashCommand = path.resolve(slashCommand);
     const slashCommandFile = require(absoluteSlashCommand);
-    console.log(`Processing command: ${absoluteSlashCommand}`);
 
     // Check if the command is in a "private" folder
     if (
@@ -78,19 +79,21 @@ module.exports = (client) => {
       `\x1b[38;2;67;170;139m[Modals] \x1b[32m${modalFile.name}\x1b[0m has been loaded.`
     );
   }
-  const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
+  const rest = new REST({ version: "9" }).setToken(isDevMode ? process.env.DEV_BOT_TOKEN : process.env.BOT_TOKEN);
   (async () => {
     try {
       // Deploy global commands
-      await rest.put(Routes.applicationCommands(CLIENT_ID), {
+      await rest.put(Routes.applicationCommands(isDevMode ? DEV_CLIENT_ID : CLIENT_ID), {
         body: commandArray,
       });
 
       // Deploy guild-specific commands
-      for (const guildId in guildCommandArrays) {
-        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, guildId), {
-          body: guildCommandArrays[guildId],
-        });
+      if (!isDevMode) {
+        for (const guildId in guildCommandArrays) {
+          await rest.put(Routes.applicationGuildCommands(isDevMode ? DEV_CLIENT_ID : CLIENT_ID, guildId), {
+            body: guildCommandArrays[guildId],
+          });
+        }
       }
     } catch (error) {
       console.error(error);

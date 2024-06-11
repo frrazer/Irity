@@ -4,6 +4,10 @@ module.exports = {
   name: "interactionCreate",
   once: false,
   async execute(interaction, client) {
+    const isDevMode = process.argv.includes('dev');
+    const developerIds = ["406163086978842625"]
+    if (isDevMode && !developerIds.includes(interaction.user.id)) return;
+
     if (interaction.isCommand() || interaction.isContextMenuCommand())
       slashInteraction(interaction, client);
     else if (interaction.isButton()) buttonInteraction(interaction, client);

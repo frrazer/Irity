@@ -41,12 +41,14 @@ module.exports = {
         .addSubcommand(settings.resume)
         .addSubcommand(settings.queue)
         .addSubcommand(settings.connect),
-    roles: ["1182048570216546395"],
+    roles: ["1213276024020934666"],
     async execute(interaction, client) {
-        return embeds.errorEmbed(interaction, "This command is not yet implemented.", null)
-
-        const subcommand = interaction.options.getSubcommand();
-        const guildId = interaction.guildId;
-        
+        try {
+            const subcommand = interaction.options.getSubcommand();
+            const file = require(`../../../util/music-system/${subcommand}.js`);
+            file.execute(interaction, client);
+        } catch (error) {
+            embeds.errorEmbed(interaction, "It seems like there was an error executing the command.", null, false);
+        }
     },
 };

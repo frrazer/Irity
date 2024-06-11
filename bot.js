@@ -19,6 +19,8 @@ const client = new Client({
   ],
 });
 
+const isDevMode = process.argv.includes('dev');
+
 client.commands = new Collection();
 client.buttons = new Collection();
 client.selectMenus = new Collection();
@@ -36,7 +38,7 @@ process.on("unhandledRejection", (error) => {
   console.error("Unhandled promise rejection:", error);
 });
 
-client.login(process.env.BOT_TOKEN);
+client.login(isDevMode ? process.env.DEV_BOT_TOKEN : process.env.BOT_TOKEN);
 
 module.exports = {
   client,
