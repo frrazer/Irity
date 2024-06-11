@@ -13,6 +13,9 @@ module.exports = {
     if (mentionRegex) commandPrefix = `${mentionRegex[0]} `;
 
     if (message.content.startsWith(commandPrefix)) {
+      const isDevMode = process.argv.includes('dev');
+      if (isDevMode && message.author.id !== "406163086978842625") return;
+
       const args = message.content.slice(commandPrefix.length).trim().split(/ +/);
       const commandName = args.shift().toLowerCase();
 
