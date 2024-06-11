@@ -11,9 +11,3 @@ manager.on("shardCreate", (shard) => {
 });
 
 manager.spawn();
-
-// Now we need to monitor 
-async function monitorListings() {
-}
-
-// monitorListings();

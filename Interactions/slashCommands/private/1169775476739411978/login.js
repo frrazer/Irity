@@ -5,8 +5,8 @@ const {
   ButtonBuilder,
   ButtonStyle,
 } = require("discord.js");
-const databaseService = require("../../../services/databaseService");
-const embeds = require("../../../util/embed");
+const databaseService = require("../../../../services/databaseService");
+const embeds = require("../../../../util/embed");
 const crypto = require("crypto");
 const EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutes
 
