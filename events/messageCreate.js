@@ -173,19 +173,19 @@ async function checkMessageForLinks(message) {
   ];
 
   const whitelist = [
-    "discord.com/channels/",
-    "ptb.discord.com/channels/",
-    "canary.discord.com/channels/",
-    "discordapp.com/channels/",
-    "www.roblox.com/groups/16592351/Casino-Empire",
-    "www.roblox.com/games/13081529792/NEW-Arcade-Haven",
-    "discord.gift/",
-    "x.com/casinoempires",
+    "https://discord.com/channels/",
+    "https://ptb.discord.com/channels/",
+    "https://canary.discord.com/channels/",
+    "https://discordapp.com/channels/",
+    "https://www.roblox.com/groups/16592351/Casino-Empire",
+    "https://www.roblox.com/games/13081529792/NEW-Arcade-Haven",
+    "https://discord.gift/",
+    "https://x.com/casinoempires",
   ];
 
   const ignoredCategories = ["1182029577736945734", "1182029534044884992", "1182029509239787590", "1182029466952806501"];
   const ignoredRoles = ["1182048570216546395"];
-  const linkRegex = /((https?:\/\/)?[^\s]+)/g;
+  const linkRegex = /(https?:\/\/[^\s]+)/g;
 
   const member = message.member;
   const userRoles = member.roles.cache.map(role => role.id);
@@ -209,7 +209,7 @@ async function checkMessageForLinks(message) {
   const links = message.content.match(linkRegex);
   if (links) {
     const isWhitelisted = links.every(link =>
-      whitelist.some(whitelistedLink => link.includes(whitelistedLink))
+      whitelist.some(whitelistedLink => link.startsWith(whitelistedLink))
     );
 
     if (isWhitelisted) return;
