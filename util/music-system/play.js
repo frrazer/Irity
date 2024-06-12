@@ -24,16 +24,18 @@ module.exports = {
             });
 
             queue = client.distube.getQueue(interaction.guild.id);
-            const added_song = queue.songs[queue.songs.length - 1];
+            let added_song = queue.songs[queue.songs.length - 1];
 
             let embed;
-
             if (!current_song) {
+                added_song = queue.songs[0];
                 embed = new EmbedBuilder()
                     .setTitle('Success!')
                     .setDescription(`<:tt_ys:1187754951171125249> Now playing: [${added_song.name}](${added_song.url}) - \`${added_song.formattedDuration}\``)
                     .setThumbnail(added_song.thumbnail).setColor("#45B681")
             } else {
+                const positionInQueue = queue.songs.find
+
                 embed = new EmbedBuilder()
                     .setTitle('Success!')
                     .setDescription(`<:tt_ys:1187754951171125249> Added [${added_song.name}](${added_song.url}) - \`${added_song.formattedDuration}\` to the queue.`)
