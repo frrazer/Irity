@@ -186,7 +186,7 @@ async function checkMessageForLinks(message) {
     "https://x.com/casinoempires",
   ];
 
-  const ignoredCategories = ["1182029577736945734", "1182029534044884992", "1182029509239787590", "1182029466952806501"];
+  const ignoredCategories = ["1182029577736945734", "1182029534044884992", "1182029509239787590", "1182029466952806501", "1057312553358868531"];
   const ignoredRoles = ["1182048570216546395"];
   const linkRegex = /(https?:\/\/[^\s]+)/g;
 
