@@ -88,8 +88,11 @@ module.exports = {
         .addSubcommand(settings.volume)
         .addSubcommand(settings.repeat)
         .addSubcommand(settings.shuffle),
-    roles: ["1213276024020934666"],
+    roles: ["1182048570216546395"],
     async execute(interaction, client) {
+        return embeds.errorEmbed(interaction, "Irity Music is current unavailable.");
+
+
         try {
             const subcommand = interaction.options.getSubcommand();
             const file = require(`../../../util/music-system/${subcommand}.js`);
