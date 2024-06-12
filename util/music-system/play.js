@@ -34,8 +34,6 @@ module.exports = {
                     .setDescription(`<:tt_ys:1187754951171125249> Now playing: [${added_song.name}](${added_song.url}) - \`${added_song.formattedDuration}\``)
                     .setThumbnail(added_song.thumbnail).setColor("#45B681")
             } else {
-                const positionInQueue = queue.songs.find
-
                 embed = new EmbedBuilder()
                     .setTitle('Success!')
                     .setDescription(`<:tt_ys:1187754951171125249> Added [${added_song.name}](${added_song.url}) - \`${added_song.formattedDuration}\` to the queue.`)
@@ -46,7 +44,7 @@ module.exports = {
 
         } catch (error) {
             console.error(error);
-            return interaction.followUp({ content: 'An error occurred while trying to play the track.', ephemeral: true });
+            return embeds.errorEmbed(interaction, "An error occurred while trying to play the song.");
         }
     }
 };
