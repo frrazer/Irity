@@ -5,7 +5,7 @@ let client;
 
 const connectToMongoDB = async () => {
   if (!client) {
-    client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    client = new MongoClient(uri);
     await client.connect();
   }
   return client;
