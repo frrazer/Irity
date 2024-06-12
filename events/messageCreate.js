@@ -74,7 +74,7 @@ async function handleRegularMessage(message, client) {
   ];
 
   try {
-    const database = databaseService.getDatabase("DiscordServer");
+    const database = await databaseService.getDatabase("DiscordServer");
     const collection = database.collection("CasinoEmpireLevelling");
     let document = await collection.findOne({ user_id: authorId });
 
