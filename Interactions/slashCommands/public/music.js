@@ -44,7 +44,7 @@ module.exports = {
         .addSubcommand(settings.resume)
         .addSubcommand(settings.queue)
         .addSubcommand(settings.connect),
-    roles: ["1213276024020934666"],
+    roles: ["1182048570216546395"],
     async execute(interaction, client) {
         try {
             const subcommand = interaction.options.getSubcommand();
