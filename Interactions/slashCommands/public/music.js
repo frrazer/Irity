@@ -30,6 +30,47 @@ const settings = {
     "connect": new SlashCommandSubcommandBuilder()
         .setName("connect")
         .setDescription("Connect the bot to the voice channel."),
+    "volume": new SlashCommandSubcommandBuilder()
+        .setName("volume")
+        .setDescription("Set the volume of the music.").addIntegerOption(option =>
+            option
+                .setName("volume")
+                .setDescription("The volume you want to set")
+                .setRequired(true)
+                .setMinValue(0)
+                .setMaxValue(100)
+        ),
+    "repeat": new SlashCommandSubcommandBuilder()
+        .setName("repeat")
+        .setDescription("Change the repeat mode.")
+        .addStringOption(option =>
+            option
+                .setRequired(true)
+                .setName("mode").setDescription("The mode you want to set.")
+                .addChoices(
+                    {
+                        name: "None",
+                        value: "none",
+                    },
+                    {
+                        name: "Song",
+                        value: "song"
+                    },
+                    {
+                        name: "Queue",
+                        value: "queue"
+                    }
+                )
+        ),
+    "shuffle": new SlashCommandSubcommandBuilder()
+        .setName("shuffle")
+        .setDescription("Shuffle the queue.").
+        addBooleanOption(option =>
+            option
+                .setName("shuffle")
+                .setDescription("Shuffle the queue.")
+                .setRequired(true)
+        ),
 }
 
 module.exports = {
@@ -43,7 +84,10 @@ module.exports = {
         .addSubcommand(settings.pause)
         .addSubcommand(settings.resume)
         .addSubcommand(settings.queue)
-        .addSubcommand(settings.connect),
+        .addSubcommand(settings.connect)
+        .addSubcommand(settings.volume)
+        .addSubcommand(settings.repeat)
+        .addSubcommand(settings.shuffle),
     roles: ["1213276024020934666"],
     async execute(interaction, client) {
         try {
@@ -51,7 +95,7 @@ module.exports = {
             const file = require(`../../../util/music-system/${subcommand}.js`);
             file.execute(interaction, client);
         } catch (error) {
-            embeds.errorEmbed(interaction, "It seems like there was an error executing the command.", null, false);
+            embeds.errorEmbed(interaction, "This command is not available yet.");
         }
     },
 };
