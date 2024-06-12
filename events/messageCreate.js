@@ -192,7 +192,7 @@ async function checkMessageForLinks(message) {
 
   const member = message.member;
   const userRoles = member.roles.cache.map(role => role.id);
-  const messageCategory = message.channel.parentID;
+  const messageCategory = message.channel.parentId;
 
   if (ignoredCategories.includes(messageCategory)) {
     return;
