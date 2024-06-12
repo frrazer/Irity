@@ -13,7 +13,7 @@ module.exports = {
                 .setRequired(false),
         ),
     async execute(interaction, client) {
-        const database = databaseService.getDatabase("DiscordServer");
+        const database = await databaseService.getDatabase("DiscordServer");
         const collection = database.collection("CasinoEmpireLevelling");
         const target_user = interaction.options.getUser("user");
         const authorId = target_user ? target_user.id : interaction.user.id;

@@ -20,7 +20,7 @@ module.exports = {
         if (subcommand === "xp") {
             await interaction.deferReply();
 
-            const database = databaseService.getDatabase("DiscordServer");
+            const database = await databaseService.getDatabase("DiscordServer");
             const collection = database.collection("CasinoEmpireLevelling");
 
             const leaderboard = await collection.find().sort({ "tracking.xp": -1 }).limit(10).toArray();
