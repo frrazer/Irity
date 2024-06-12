@@ -5,7 +5,10 @@ const embeds = require("../../../util/embed")
 const settings = {
     "play": new SlashCommandSubcommandBuilder()
         .setName("play")
-        .setDescription("Play or queue a song."),
+        .setDescription("Play or queue a song.").addStringOption(option =>
+            option.setName("query")
+                .setDescription("The song you want to play.")
+                .setRequired(true)),
     "skip": new SlashCommandSubcommandBuilder()
         .setName("skip")
         .setDescription("Skip the current song."),

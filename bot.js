@@ -6,6 +6,10 @@ const {
   Collection,
   Partials,
 } = require("discord.js");
+
+const { DisTube } = require("distube");
+const { SoundCloudPlugin } = require("@distube/soundcloud")
+
 const client = new Client({
   partials: [Partials.Channel, Partials.Message, Partials.GuildMember],
   intents: [
@@ -20,7 +24,6 @@ const client = new Client({
 });
 
 const isDevMode = process.argv.includes('dev');
-
 client.commands = new Collection();
 client.buttons = new Collection();
 client.selectMenus = new Collection();
@@ -37,6 +40,11 @@ client.cooldowns = new Collection();
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled promise rejection:", error);
 });
+
+client.distube = new DisTube(client, {
+  plugins: [new SoundCloudPlugin()],
+  
+})
 
 client.login(isDevMode ? process.env.DEV_BOT_TOKEN : process.env.BOT_TOKEN);
 
