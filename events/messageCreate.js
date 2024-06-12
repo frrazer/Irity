@@ -8,14 +8,14 @@ module.exports = {
   name: "messageCreate",
   once: false,
   async execute(message, client) {
+    const isDevMode = process.argv.includes('dev');
+    if (isDevMode && message.author.id !== "406163086978842625") return;
+
     let commandPrefix = prefix;
     const mentionRegex = new RegExp(`^<@!?(${client.user.id})>`, "gi").exec(message.content);
     if (mentionRegex) commandPrefix = `${mentionRegex[0]} `;
 
     if (message.content.startsWith(commandPrefix)) {
-      const isDevMode = process.argv.includes('dev');
-      if (isDevMode && message.author.id !== "406163086978842625") return;
-
       const args = message.content.slice(commandPrefix.length).trim().split(/ +/);
       const commandName = args.shift().toLowerCase();
 
