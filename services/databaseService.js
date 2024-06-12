@@ -1,15 +1,24 @@
-const getDatabase = (databaseName) => {
-  const { MongoClient } = require("mongodb");
-  const config = require("../util/config.json");
+const { MongoClient } = require("mongodb");
 
-  const uri = process.env.MONGO_URI
-  const client = new MongoClient(uri);
+const uri = process.env.MONGO_URI;
+let client;
 
+const connectToMongoDB = async () => {
+  if (!client) {
+    client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect();
+  }
+  return client;
+};
+
+const getDatabase = async (databaseName) => {
   try {
+    const client = await connectToMongoDB();
     const database = client.db(databaseName);
     return database;
   } catch (error) {
-    console.error(error);
+    console.error("Error connecting to MongoDB:", error);
+    throw error;
   }
 };
 
