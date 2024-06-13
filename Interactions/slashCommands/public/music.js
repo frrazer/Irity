@@ -64,13 +64,18 @@ const settings = {
         ),
     "shuffle": new SlashCommandSubcommandBuilder()
         .setName("shuffle")
-        .setDescription("Shuffle the queue.").
-        addBooleanOption(option =>
+        .setDescription("Shuffle the queue."),
+    "bassboost": new SlashCommandSubcommandBuilder()
+        .setName("bassboost")
+        .setDescription("Set the bass boost level.")
+        .addIntegerOption(option =>
             option
-                .setName("shuffle")
-                .setDescription("Shuffle the queue.")
+                .setName("level")
+                .setDescription("The level you want to set.")
                 .setRequired(true)
-        ),
+                .setMinValue(0)
+                .setMaxValue(10)
+        )
 }
 
 module.exports = {
@@ -87,7 +92,8 @@ module.exports = {
         .addSubcommand(settings.connect)
         .addSubcommand(settings.volume)
         .addSubcommand(settings.repeat)
-        .addSubcommand(settings.shuffle),
+        .addSubcommand(settings.shuffle)
+        .addSubcommand(settings.bassboost),
     roles: ["1182048570216546395"],
     async execute(interaction, client) {
         try {
