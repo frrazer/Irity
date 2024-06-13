@@ -43,7 +43,10 @@ process.on("unhandledRejection", (error) => {
 
 client.distube = new DisTube(client, {
   plugins: [new SoundCloudPlugin()],
-  
+})
+
+client.distube.on("finish", (queue) => {
+  client.distube.voices.leave(queue.id);
 })
 
 client.login(isDevMode ? process.env.DEV_BOT_TOKEN : process.env.BOT_TOKEN);
