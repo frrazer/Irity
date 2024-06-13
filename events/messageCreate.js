@@ -188,6 +188,7 @@ async function checkMessageForLinks(message) {
 
   const ignoredCategories = ["1182029577736945734", "1182029534044884992", "1182029509239787590", "1182029466952806501", "1057312553358868531"];
   const ignoredRoles = ["1182048570216546395", "932538393622085652"];
+  const ignoredMembers = ["573950888721514523"];
   const linkRegex = /(https?:\/\/[^\s]+)/g;
 
   const member = message.member;
@@ -199,6 +200,10 @@ async function checkMessageForLinks(message) {
   }
 
   if (ignoredRoles.some(role => userRoles.includes(role))) {
+    return;
+  }
+
+  if (ignoredMembers.includes(message.author.id)) {
     return;
   }
 
