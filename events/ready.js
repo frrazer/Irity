@@ -25,9 +25,6 @@ module.exports = {
       type: ActivityType.Playing,
     });
 
-    const channel = client.channels.cache.get("1089320905395667045");
-    // channel.send(`⚡ 2x XP is now active! Ending <t:1718136981:R>`)
-
     usageMonitor(client);
   },
 };

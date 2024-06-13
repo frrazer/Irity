@@ -103,15 +103,7 @@ async function handleRegularMessage(message, client) {
     const newXp = xp + xpToAdd;
     const newMessages = messages + 1;
 
-    const xp_multi_end = 1718136981000
-
     if (last_message + 60000 > Date.now()) return;
-
-    // double xp event 
-    if (xp_multi_end > Date.now()) {
-      xpToAdd *= 2;
-    }
-
     await collection.updateOne({ user_id: authorId }, {
       $set: {
         "tracking.messages": newMessages,
