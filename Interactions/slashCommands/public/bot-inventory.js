@@ -25,12 +25,16 @@ const settings = {
                 .setRequired(true)
                 .addChoices(
                     {
-                        name: "Top Valued Items",
+                        name: "Top Total Value Items",
                         value: "value"
                     },
                     {
                         name: "Most Hoarded Items",
                         value: "quantity"
+                    },
+                    {
+                        name: "Best Items",
+                        value: "best"
                     }
                 )
         ),
@@ -124,12 +128,17 @@ module.exports = {
                     items.sort((a, b) => {
                         return b.serials.filter(serial => serial.u === 1).length - a.serials.filter(serial => serial.u === 1).length;
                     });
+                } else if (method === "best") {
+                    // sort by the highest value
+                    items.sort((a, b) => {
+                        return (b.value || b.rap) - (a.value || a.rap);
+                    });
                 }
 
                 const embed = new EmbedBuilder()
                     .setTitle(`Arcade Haven Bot Top Items`)
                     .setColor("Blue").setFooter({
-                        text: `Sorted by ${method === "value" ? "Value" : "Quantity"} | Total Value: $${abriviateNumber(bot_total_value)}`,
+                        text: `Sorted by ${method === "value" ? "Value" : (method === "quantity" ? "Quantity" : "Best Items")} | Total Value: $${abriviateNumber(bot_total_value)}`,
                     })
 
                 let descripion = "";
@@ -138,6 +147,8 @@ module.exports = {
                         descripion += `**${index + 1}.** **${item.name}** - $${abriviateNumber(((item.value || item.rap) * item.serials.filter(serial => serial.u === 1).length))} Value (x${item.serials.filter(serial => serial.u === 1).length})\n`;
                     } else if (method === "quantity") {
                         descripion += `**${index + 1}.** **${item.name}** - x${item.serials.filter(serial => serial.u === 1).length}\n`;
+                    } else if (method === "best") {
+                        descripion += `**${index + 1}.** **${item.name}** - $${abriviateNumber(((item.value || item.rap) * item.serials.filter(serial => serial.u === 1).length))} Value (x${item.serials.filter(serial => serial.u === 1).length})\n`;
                     }
                 });
 
