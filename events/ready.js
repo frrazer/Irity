@@ -9,6 +9,7 @@ const { convertTime } = require("../util/functions");
 const os = require("os");
 const databaseService = require("../services/databaseService");
 const usageMonitor = require("../util/bot_monitors/usageMonitor");
+const addCashMonitor = require("../util/bot_monitors/addCashMonitor");
 const { joinVoiceChannel } = require("@discordjs/voice")
 
 module.exports = {
@@ -26,5 +27,6 @@ module.exports = {
     });
 
     usageMonitor(client);
+    addCashMonitor(client);
   },
 };
