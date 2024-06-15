@@ -100,6 +100,14 @@ async function handleRegularMessage(message, client) {
     const { tracking } = document;
     const { messages, xp, last_message } = tracking;
     let xpToAdd = Math.floor(15 + Math.random() * 11);
+
+    const xp_multiplier_expire = 1718468400
+    const xp_multiplier = 2
+
+    if (Date.now() / 1000 > xp_multiplier_expire) {
+      xpToAdd *= xp_multiplier;
+    }
+
     const newXp = xp + xpToAdd;
     const newMessages = messages + 1;
 
