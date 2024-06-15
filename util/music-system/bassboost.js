@@ -14,8 +14,8 @@ module.exports = {
             return embeds.errorEmbed(interaction, 'There is nothing playing.', null, false);
         }
 
-        if (level < 0 || level > 10) {
-            return embeds.errorEmbed(interaction, 'The bass boost level must be between 0 and 10.', null, false);
+        if (level < 0 || level > 5) {
+            return embeds.errorEmbed(interaction, 'The bass boost level must be between 0 and 5.', null, false);
         }
 
         try {
