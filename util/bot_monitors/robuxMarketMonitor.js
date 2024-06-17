@@ -22,7 +22,6 @@ module.exports = async function (client) {
                 const item_data = items_data.find(item => item.itemId === listing.itemId);
                 if (!item_data) {
                     await robux_market.deleteOne({ _id: listing._id });
-                    console.log(`Deleted listing ${listing._id} due to missing item data`);
                     continue;
                 }
 
@@ -32,7 +31,6 @@ module.exports = async function (client) {
 
                 if (owner_id !== seller_id) {
                     await robux_market.deleteOne({ _id: listing._id });
-                    console.log(`Deleted listing ${listing._id} due to mismatched owner and seller`);
                     continue;
                 }
 
@@ -41,7 +39,6 @@ module.exports = async function (client) {
 
                 if (ratePer10k < minimum_rate) {
                     await robux_market.deleteOne({ _id: listing._id });
-                    console.log(`Deleted listing ${listing._id} due to rate being lower than ${minimum_rate}`);
                     continue;
                 }
             }
