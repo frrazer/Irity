@@ -115,8 +115,10 @@ module.exports = {
                     )
                     .toArray();
                 let bot_total_value = 0;
+                let total_items = 0;
                 items.forEach(item => {
                     bot_total_value += (item.value || item.rap) * item.serials.filter(serial => serial.u === 1).length;
+                    total_items += item.serials.filter(serial => serial.u === 1).length;
                 });
 
                 if (method === "value") {
@@ -138,7 +140,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setTitle(`Arcade Haven Bot Top Items`)
                     .setColor("Blue").setFooter({
-                        text: `Sorted by ${method === "value" ? "Value" : (method === "quantity" ? "Quantity" : "Best Items")} | Total Value: $${abriviateNumber(bot_total_value)}`,
+                        text: `Sorted by ${method === "value" ? "Value" : (method === "quantity" ? "Quantity" : "Best Items")} | Total Value: $${abriviateNumber(bot_total_value)} | Total Items: ${total_items.toLocaleString()}`,
                     })
 
                 let descripion = "";
