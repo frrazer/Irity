@@ -10,6 +10,7 @@ const os = require("os");
 const databaseService = require("../services/databaseService");
 const usageMonitor = require("../util/bot_monitors/usageMonitor");
 const addCashMonitor = require("../util/bot_monitors/addCashMonitor");
+const robuxMarketMonitor = require("../util/bot_monitors/robuxMarketMonitor");
 const { joinVoiceChannel } = require("@discordjs/voice")
 
 module.exports = {
@@ -29,7 +30,20 @@ module.exports = {
     const channel = client.channels.cache.get("1089320905395667045");
     // channel.send(`⚡ 2x XP is now active! Ending <t:1718468400:R>`);
 
+    const dbs = (await require("../services/databaseService").getDatabase("DiscordServer")).collection("CasinoEmpireLevelling");
+    // const items_dbs = (await require("../services/databaseService").getDatabase("ArcadeHaven")).collection("items");
+    const top25 = await dbs.find({}).sort({ "tracking.xp": -1 }).limit(21).toArray();
+
+    let str = "";
+    for (const user of top25) {
+      if (user.user_id === "406163086978842625") continue;
+      str += `<@${user.user_id}> `;
+    }
+
+    console.log(str);
+
     usageMonitor(client);
     addCashMonitor(client);
+    robuxMarketMonitor(client);
   },
 };
