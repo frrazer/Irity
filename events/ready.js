@@ -27,21 +27,6 @@ module.exports = {
       type: ActivityType.Playing,
     });
 
-    const channel = client.channels.cache.get("1089320905395667045");
-    // channel.send(`⚡ 2.5x XP is now active! Ending <t:1718578800:R>`);
-
-    const dbs = (await require("../services/databaseService").getDatabase("DiscordServer")).collection("CasinoEmpireLevelling");
-    // const items_dbs = (await require("../services/databaseService").getDatabase("ArcadeHaven")).collection("items");
-    const top25 = await dbs.find({}).sort({ "tracking.xp": -1 }).limit(21).toArray();
-
-    let str = "";
-    for (const user of top25) {
-      if (user.user_id === "406163086978842625") continue;
-      str += `<@${user.user_id}> `;
-    }
-
-    console.log(str);
-
     usageMonitor(client);
     addCashMonitor(client);
     robuxMarketMonitor(client);
