@@ -88,13 +88,12 @@ module.exports = (client) => {
       });
 
       // Deploy guild-specific commands
-      if (!isDevMode) {
-        for (const guildId in guildCommandArrays) {
-          await rest.put(Routes.applicationGuildCommands(isDevMode ? DEV_CLIENT_ID : CLIENT_ID, guildId), {
-            body: guildCommandArrays[guildId],
-          });
-        }
+      for (const guildId in guildCommandArrays) {
+        await rest.put(Routes.applicationGuildCommands(isDevMode ? DEV_CLIENT_ID : CLIENT_ID, guildId), {
+          body: guildCommandArrays[guildId],
+        });
       }
+
     } catch (error) {
       console.error(error);
     }

@@ -5,7 +5,7 @@ module.exports = {
   once: false,
   async execute(interaction, client) {
     const isDevMode = process.argv.includes('dev');
-    const developerIds = ["406163086978842625"]
+    const developerIds = ["406163086978842625", "733707800345051216"]
     if (isDevMode && !developerIds.includes(interaction.user.id)) return;
 
     if (interaction.isCommand() || interaction.isContextMenuCommand())

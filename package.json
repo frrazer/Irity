@@ -18,6 +18,7 @@
     "distube": "^5.0.1",
     "dotenv": "^16.4.5",
     "ioredis": "^5.4.1",
+    "mathjs": "^13.0.0",
     "mongodb": "^6.6.1",
     "noblox.js": "^4.15.1",
     "nodemailer": "^6.9.13",
