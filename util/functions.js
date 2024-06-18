@@ -110,5 +110,78 @@ function convertTime(ms) {
     return seconds + "s"; // Return seconds if there are no minutes
   }
 }
+function abbreviateNumber(num) {
+  let isNegative = num < 0; // Check if the number is negative
+  let absNum = Math.abs(num); // Work with the absolute value for abbreviation
 
-module.exports = { getFiles, cooldown, permissions, roles, convertTime };
+  if (absNum < 1000) {
+    return (isNegative ? "-" : "") + absNum.toFixed(2); // Prepend minus if negative
+  }
+
+  let abbreviations = [
+    { limit: 1e3, suffix: "K" },
+    { limit: 1e6, suffix: "M" },
+    { limit: 1e9, suffix: "B" },
+    { limit: 1e12, suffix: "T" },
+    { limit: 1e15, suffix: "Q" },
+    { limit: 1e18, suffix: "Qu" }
+  ];
+
+  for (let i = abbreviations.length - 1; i >= 0; i--) {
+    let { limit, suffix } = abbreviations[i];
+    if (absNum >= limit) {
+      return (isNegative ? "-" : "") + (absNum / limit).toFixed(2) + suffix; // Prepend minus if negative
+    }
+  }
+}
+
+function stringToDuration(timeString) {
+  const timeRegex = /^(\d+[ywdhmsM])+$/;
+  if (!timeRegex.test(timeString)) {
+    throw new Error("Invalid time format");
+  }
+
+  const matches = Array.from(timeString.matchAll(/(\d+)([ywdhmsM])/g));
+  let duration = 0;
+
+  const unitToSeconds = {
+    s: 1,
+    m: 60,
+    h: 3600,
+    d: 86400,
+    w: 604800,
+    M: 2592000,
+    y: 31536000,
+  };
+
+  for (const match of matches) {
+    const amount = parseInt(match[1], 10);
+    const unit = match[2];
+
+    if (isNaN(amount) || !unitToSeconds[unit]) {
+      throw new Error("Invalid time amount or unit");
+    }
+
+    duration += amount * unitToSeconds[unit];
+  }
+
+  return duration;
+}
+
+function calculateExpression (expression) {
+  expression = expression.replace(/(\d+(\.\d+)?)(k)/gi, (match, p1) => (parseFloat(p1) * 1000).toString());
+  expression = expression.replace(/(\d+(\.\d+)?)(m)/gi, (match, p1) => (parseFloat(p1) * 1000000).toString());
+  expression = expression.replace(/(\d+(\.\d+)?)(b)/gi, (match, p1) => (parseFloat(p1) * 1000000000).toString());
+  expression = expression.replace(/(\d+(\.\d+)?)(t)/gi, (match, p1) => (parseFloat(p1) * 1000000000000).toString());
+  expression = expression.replace(/,/g, '');
+
+  try {
+    const result = require("mathjs").evaluate(expression);
+    return result;
+  } catch (error) {
+    return "Invalid expression";
+  }
+}
+
+
+module.exports = { getFiles, cooldown, permissions, roles, convertTime, abbreviateNumber, stringToDuration, calculateExpression };
