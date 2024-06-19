@@ -179,6 +179,7 @@ function calculateExpression (expression) {
     const result = require("mathjs").evaluate(expression);
     return result;
   } catch (error) {
+    console.error(error);
     return "Invalid expression";
   }
 }
