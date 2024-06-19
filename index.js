@@ -13,7 +13,7 @@ const manager = new ShardingManager("./bot.js", {
 console.log(`Starting ${isDevMode ? "Development" : "Production"} Mode`);
 
 manager.on("shardCreate", (shard) => {
-  console.log(`Shard Launched: ${shard.id}!`);
+  console.log(`Shard Launched: ${shard.id}`);
 });
 
 manager.spawn();
