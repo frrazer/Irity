@@ -400,8 +400,9 @@ module.exports = {
                     const case_id = await createCase({
                         type: "Ban",
                         target: ban_user_id,
-                        reason: reason,
+                        reason,
                         moderator: interaction.user.id,
+                        proof,
                         timestamp: Date.now(),
                     })
 
