@@ -7,13 +7,18 @@ const settings = {
         .setName("lookup")
         .setDescription("Lookup a user's data.")
         .addStringOption(option => option.setName("username").setDescription("The user to lookup.").setRequired(true)),
+    "case": new SlashCommandSubcommandBuilder()
+        .setName("case")
+        .setDescription("Lookup a case.")
+        .addIntegerOption(option => option.setName("case").setDescription("The case to lookup.").setRequired(true)),
 }
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("admin")
         .setDescription("Administrative commands.")
-        .addSubcommand(settings.lookup),
+        .addSubcommand(settings.lookup)
+        .addSubcommand(settings.case),
     roles: ["1182048570216546395"],
     async execute(interaction, client) {
         const subcommand = interaction.options.getSubcommand();
