@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 const databaseService = require("../../services/databaseService");
 const embeds = require("../../util/embed");
-const { getUsernameFromId } = require("noblox.js")
+const { getUsernameFromId, getPlayerThumbnail } = require("noblox.js")
 
 module.exports = {
     async execute(interaction, client) {
@@ -40,6 +40,14 @@ module.exports = {
             inline: true
         }]
 
+        let thumbnail
+        try {
+            thumbnail = (await getPlayerThumbnail(data.target, "180x180", "png", false, "headshot"))[0].imageUrl
+        } catch (error) {
+            console.error(error)
+            thumbnail = null
+        }
+
         if (data.type.includes("Ban")) {
             fields.push({
                 name: "Proof",
@@ -51,6 +59,8 @@ module.exports = {
             .addFields(...fields)
             .setTimestamp(new Date(data.timestamp))
             .setColor("Red")
+
+        if (thumbnail) embed.setThumbnail(thumbnail)
 
         await interaction.editReply({ embeds: [embed] });
     }
