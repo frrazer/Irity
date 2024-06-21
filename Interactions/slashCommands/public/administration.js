@@ -11,6 +11,34 @@ const settings = {
         .setName("case")
         .setDescription("Lookup a case.")
         .addIntegerOption(option => option.setName("case").setDescription("The case to lookup.").setRequired(true)),
+    "settings": new SlashCommandSubcommandBuilder()
+        .setName("settings")
+        .setDescription("Set Arcade Haven game settings.")
+        .addStringOption(option =>
+            option
+                .setName("setting")
+                .setDescription("The setting to change.")
+                .setRequired(true)
+                .addChoices(
+                    {
+                        name: "Tips",
+                        value: "tips_enabled"
+                    },
+                    {
+                        name: "Marketplace",
+                        value: "market_enabled"
+                    },
+                    {
+                        name: "Robux Marketplace",
+                        value: "robux_market"
+                    }
+                )
+        ).addBooleanOption(option =>
+            option
+                .setName("enabled")
+                .setDescription("The new value of the setting.")
+                .setRequired(true)
+        )
 }
 
 module.exports = {
@@ -18,7 +46,8 @@ module.exports = {
         .setName("admin")
         .setDescription("Administrative commands.")
         .addSubcommand(settings.lookup)
-        .addSubcommand(settings.case),
+        .addSubcommand(settings.case)
+        .addSubcommand(settings.settings),
     roles: ["1182048570216546395"],
     async execute(interaction, client) {
         const subcommand = interaction.options.getSubcommand();
