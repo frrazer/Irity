@@ -77,7 +77,7 @@ async function handleTipsChannel(message) {
 
 async function saveTransaction(transaction) {
     try {
-        const database = await databaseService.getDatabase("DiscordServer");
+        const database = await databaseService.getDatabase("ArcadeHaven");
         const collection = database.collection("game_transactions");
         await collection.insertOne(transaction);
     } catch (error) {
