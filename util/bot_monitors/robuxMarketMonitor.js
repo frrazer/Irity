@@ -17,7 +17,7 @@ module.exports = async function (client) {
                 }
             }).toArray();
 
-            const minimum_rate = 0
+            // const minimum_rate = 0
             for (let listing of listings) {
                 const item_data = items_data.find(item => item.itemId === listing.itemId);
                 if (!item_data) {
@@ -37,10 +37,10 @@ module.exports = async function (client) {
                 const valuePerRobux = (item_data.value || 0) / listing.price;
                 const ratePer10k = 10000 / valuePerRobux;
 
-                if (ratePer10k < minimum_rate) {
-                    await robux_market.deleteOne({ _id: listing._id });
-                    continue;
-                }
+                // if (ratePer10k < minimum_rate) {
+                //     await robux_market.deleteOne({ _id: listing._id });
+                //     continue;
+                // }
             }
         } catch (error) {
             console.error(error);
