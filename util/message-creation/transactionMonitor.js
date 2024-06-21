@@ -49,7 +49,7 @@ async function handleRAPChangesChannel(message) {
         buyer_id,
         seller_id,
         sale_price,
-        sale_date,
+        date: sale_date,
         transaction_id,
         type: "marketplace"
     };
@@ -67,7 +67,7 @@ async function handleTipsChannel(message) {
         tipper,
         tipped,
         amount,
-        tip_date,
+        date: tip_date,
         transaction_id: generateTransactionId(),
         type: "tip"
     };
