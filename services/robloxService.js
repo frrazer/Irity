@@ -64,7 +64,7 @@ module.exports = {
         entry.data.Data.Moderation.AdminName = admin
         entry.data.Data.Moderation.BanData2.Reason = reason
         entry.data.Data.Moderation.BanData2.Banned = true
-        entry.data.Data.Moderation.BanData2.EpochTime = Math.floor(Date.now() / 1000) + true_duration
+        entry.data.Data.Moderation.BanData2.EpochTime = true_duration === -1 ? -1 : Math.floor(Date.now() / 1000) + true_duration
         delete entry.data.MetaData.ActiveSession
 
         await this.setDatastoreEntry(key, entry.data)
