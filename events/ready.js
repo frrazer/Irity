@@ -11,6 +11,7 @@ const databaseService = require("../services/databaseService");
 const usageMonitor = require("../util/bot_monitors/usageMonitor");
 const addCashMonitor = require("../util/bot_monitors/addCashMonitor");
 const robuxMarketMonitor = require("../util/bot_monitors/robuxMarketMonitor");
+const activeCodeMonitor = require("../util/bot_monitors/activeCodeMonitor");
 const { joinVoiceChannel } = require("@discordjs/voice")
 
 module.exports = {
@@ -30,5 +31,6 @@ module.exports = {
     usageMonitor(client);
     addCashMonitor(client);
     robuxMarketMonitor(client);
+    activeCodeMonitor(client);
   },
 };
