@@ -38,6 +38,15 @@ const settings = {
                 .setName("enabled")
                 .setDescription("The new value of the setting.")
                 .setRequired(true)
+        ),
+    "upload": new SlashCommandSubcommandBuilder()
+        .setName("upload")
+        .setDescription("Upload a file to the server.")
+        .addStringOption(option =>
+            option
+                .setName("url")
+                .setDescription("The URL of the file to upload.")
+                .setRequired(true)
         )
 }
 
@@ -47,7 +56,8 @@ module.exports = {
         .setDescription("Administrative commands.")
         .addSubcommand(settings.lookup)
         .addSubcommand(settings.case)
-        .addSubcommand(settings.settings),
+        .addSubcommand(settings.settings)
+        .addSubcommand(settings.upload),
     roles: ["1182048570216546395"],
     async execute(interaction, client) {
         const subcommand = interaction.options.getSubcommand();
