@@ -34,7 +34,9 @@ module.exports = async function (client) {
                 }
             }
 
-            message.edit(content)
+            if (message.content !== content) {
+                message.edit(content)
+            }
         } catch (error) {
             console.error(error);
         }
