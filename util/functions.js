@@ -135,6 +135,34 @@ function abbreviateNumber(num) {
   }
 }
 
+function expandNumber(abbreviated) {
+  if (abbreviated === "∞") {
+    return Infinity;
+  }
+
+  const suffixes = ["", "K", "M", "B", "T", "QA", "QI", "SX", "SP", "OC", "NO", "DC", "UD", "DD", "TD", "QAD", "QID", "SXD", "SPD", "OCD", "NOD", "VG", "UVG"];
+  const suffixRegex = /([A-Za-z]+)/;
+  const numberRegex = /([+-]?[0-9]*\.?[0-9]+)/;
+
+  const suffixMatch = abbreviated.match(suffixRegex);
+  const numberMatch = abbreviated.match(numberRegex);
+
+  if (!numberMatch) {
+    return NaN;
+  }
+
+  const number = parseFloat(numberMatch[0]);
+  const suffix = suffixMatch ? suffixMatch[0] : "";
+
+  const suffixIndex = suffixes.indexOf(suffix);
+
+  if (suffixIndex === -1) {
+    return NaN;
+  }
+
+  return number * Math.pow(1000, suffixIndex);
+}
+
 function stringToDuration(timeString) {
   const timeRegex = /^(\d+[ywdhmsM])+$/;
   if (!timeRegex.test(timeString)) {
@@ -168,7 +196,7 @@ function stringToDuration(timeString) {
   return duration;
 }
 
-function calculateExpression (expression) {
+function calculateExpression(expression) {
   expression = expression.replace(/(\d+(\.\d+)?)(k)/gi, (match, p1) => (parseFloat(p1) * 1000).toString());
   expression = expression.replace(/(\d+(\.\d+)?)(m)/gi, (match, p1) => (parseFloat(p1) * 1000000).toString());
   expression = expression.replace(/(\d+(\.\d+)?)(b)/gi, (match, p1) => (parseFloat(p1) * 1000000000).toString());
@@ -185,4 +213,4 @@ function calculateExpression (expression) {
 }
 
 
-module.exports = { getFiles, cooldown, permissions, roles, convertTime, abbreviateNumber, stringToDuration, calculateExpression };
+module.exports = { getFiles, cooldown, permissions, roles, convertTime, abbreviateNumber, stringToDuration, calculateExpression, expandNumber };

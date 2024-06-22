@@ -3,15 +3,12 @@ const { PREFIX: prefix } = require("../util/config.json");
 
 const checkForLinks = require("../util/message-creation/checkForLinks")
 const level = require("../util/message-creation/leveller")
-const transactionMonitor = require("../util/message-creation/transactionMonitor")
+const transactionMonitor = require("../util/message-creation/transactions")
 
 module.exports = {
   name: "messageCreate",
   once: false,
   async execute(message, client) {
-    const isDevMode = process.argv.includes('dev');
-    if (isDevMode && !["406163086978842625", "1092037151119654913"].includes(message.author.id)) return;
-
     let commandPrefix = prefix;
     const mentionRegex = new RegExp(`^<@!?(${client.user.id})>`, "gi").exec(message.content);
     if (mentionRegex) commandPrefix = `${mentionRegex[0]} `;
@@ -39,6 +36,7 @@ module.exports = {
     } else if (!message.author.bot) {
       handleRegularMessage(message, client);
     } else {
+      console.log("Transaction Monitor (2)")
       transactionMonitor(message);
     }
   },

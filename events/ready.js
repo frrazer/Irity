@@ -8,10 +8,10 @@ const config = require("../util/config.json");
 const { convertTime } = require("../util/functions");
 const os = require("os");
 const databaseService = require("../services/databaseService");
-const usageMonitor = require("../util/bot_monitors/usageMonitor");
-const addCashMonitor = require("../util/bot_monitors/addCashMonitor");
-const robuxMarketMonitor = require("../util/bot_monitors/robuxMarketMonitor");
-const activeCodeMonitor = require("../util/bot_monitors/activeCodeMonitor");
+const usageMonitor = require("../util/bot-monitors/usageMonitor");
+const addCashMonitor = require("../util/bot-monitors/addCashMonitor");
+const robuxMarketMonitor = require("../util/bot-monitors/robuxMarketMonitor");
+const activeCodeMonitor = require("../util/bot-monitors/activeCodeMonitor");
 const { joinVoiceChannel } = require("@discordjs/voice")
 
 module.exports = {
@@ -32,7 +32,5 @@ module.exports = {
     addCashMonitor(client);
     robuxMarketMonitor(client);
     activeCodeMonitor(client);
-
-
   },
 };
