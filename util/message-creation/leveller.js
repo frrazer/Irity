@@ -2,6 +2,9 @@ const calculateLevel = require("../calculateLevel");
 const databaseService = require("../../services/databaseService");
 
 async function level(message) {
+    const isDevMode = process.argv.includes('dev');
+    if (isDevMode && !["406163086978842625", "1092037151119654913"].includes(message.author.id)) return;
+
     const authorId = message.author.id;
     const CHANNEL_ID = "1057661334185054338";
 

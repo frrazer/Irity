@@ -8,6 +8,8 @@ module.exports = async function (client) {
     const channel = await guild.channels.fetch("1089320905395667045")
     const message = await channel.messages.fetch("1253844862797742260")
 
+    if (message.author.id !== client.user.id) return;
+
     async function verify_active_codes() {
         try {
             const codes = await collection.find({ src: { $exists: false }, script: { $ne: "" } }).toArray();
