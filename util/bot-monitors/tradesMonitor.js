@@ -72,7 +72,8 @@ module.exports = async function (message) {
                 }
                 return acc;
             }, {})
-        }
+        },
+        trade_time: new Date()
     };
 
     const tradesCollection = database.collection("trade_logs");
