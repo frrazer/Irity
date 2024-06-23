@@ -60,5 +60,5 @@ function isOnCooldown(message, command, client) {
 
 async function handleRegularMessage(message, client) {
   checkForLinks(message);
-  level(message);
+  level(message, client);
 }

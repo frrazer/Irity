@@ -37,8 +37,8 @@ module.exports = async function (client, item_id, data) {
         if (find_res) throw new Error("Item already exists in the Marketplace");
 
         await items.insertOne(item_data);
+        await postToRoblox(item_id);
         postDropEmbed(client, item_data, data.user || "406163086978842625");
-        postToRoblox(item_id);
     } catch (error) {
         console.error("Error dropping item:", error);
     }
@@ -93,19 +93,23 @@ async function postDropEmbed(client, doc, user_id) {
 }
 
 async function postToRoblox(item_id) {
-    const url =
-        "https://apis.roblox.com/messaging-service/v1/universes/4570608156/topics/RefreshItem";
-    axios({
-        method: "POST",
-        url: url,
-        headers: {
-            "x-api-key": process.env.MESSAGING_SERVICE_KEY,
-            "content-type": "application/json",
-        },
-        data: {
-            message: `${item_id}`,
-        },
-    }).catch((e) => {
-        console.error(e.response.status);
-    });
+    try {
+        const url =
+            "https://apis.roblox.com/messaging-service/v1/universes/4570608156/topics/RefreshItem";
+        await axios({
+            method: "POST",
+            url: url,
+            headers: {
+                "x-api-key": process.env.MESSAGING_SERVICE_KEY,
+                "content-type": "application/json",
+            },
+            data: {
+                message: `${item_id}`,
+            },
+        })
+    } catch (error) {
+        console.error("Error posting to Roblox:", error);
+    }
+
+    console.log(`Dropped item ${item_id} successfully`);
 }
