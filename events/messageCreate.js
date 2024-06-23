@@ -36,7 +36,6 @@ module.exports = {
     } else if (!message.author.bot) {
       handleRegularMessage(message, client);
     } else {
-      console.log("Transaction Monitor (2)")
       transactionMonitor(message);
     }
   },
