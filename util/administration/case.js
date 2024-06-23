@@ -13,6 +13,11 @@ module.exports = {
         if (!data) return embeds.errorEmbed(interaction, "No case found with that ID.");
         await interaction.deferReply();
 
+        if (data.message) {
+            const embed = EmbedBuilder.from(data.message.embeds[0].data)
+            return interaction.editReply({ embeds: [embed] });
+        }
+
         const moderator = await interaction.guild.members.fetch(data.moderator);
         const target_name = await getUsernameFromId(data.target);
         let fields = [{

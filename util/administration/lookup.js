@@ -21,7 +21,7 @@ async function createCase(data) {
     return caseId
 }
 
-async function logAction(client, data) {
+async function logAction(client, data, case_id) {
     let guild = client.guilds.cache.get("932320416989610065")
 
     if (!guild) {
@@ -33,7 +33,11 @@ async function logAction(client, data) {
     }
 
     const channel = guild.channels.cache.get("1118861387704320030")
-    channel.send(data)
+    const message = channel.send(data)
+
+    const database = await databaseService.getDatabase("ArcadeHaven")
+    const collection = database.collection("ModerationCases")
+    collection.updateOne({ caseId: case_id }, { $set: { message: data } }) // this is so when we run /admin case we can see the exact message
 }
 
 module.exports = {
@@ -438,7 +442,7 @@ module.exports = {
                                 .setThumbnail(embed.data.thumbnail.url)
                                 .setColor("Red")
                         ]
-                    })
+                    }, case_id)
                 }).catch((error) => {
                     console.error(error)
                     return embeds.errorEmbed(interaction, "Something went wrong, please try again later.")
@@ -456,6 +460,8 @@ module.exports = {
                     return embeds.errorEmbed(interaction, "I wasn't able to calculate the new cash amount.")
                 }
 
+                const current_cash = document.value.data.Data.Cash
+
                 robloxService.setCash(`MAIN_${edit_user_id}`, new_amount).then(async (success) => {
                     const embed = EmbedBuilder.from(interaction.message.embeds[0])
                     embed.setDescription(`**Cash:** $${new_amount.toLocaleString()}\n**Profit:** $${abbreviateNumber(document.value.data.Data.Profit)}\n**Wagered:** $${abbreviateNumber(document.value.data.Data.Wagered)}`)
@@ -466,7 +472,7 @@ module.exports = {
                     const case_id = await createCase({
                         type: "Cash-Edit",
                         target: edit_user_id,
-                        reason: `Changed cash to $${new_amount.toLocaleString()}`,
+                        reason: `**Old Cash:** $${current_cash.toLocaleString()}\n**New Cash:** $${new_amount.toLocaleString()}`,
                         moderator: interaction.user.id,
                         timestamp: Date.now(),
                     })
@@ -495,15 +501,21 @@ module.exports = {
                                         value: `<:singleright:1252703372998611085> [\`@${edit_username}\`](https://www.roblox.com/users/${edit_user_id}/profile)`,
                                     },
                                     {
-                                        name: "Reason",
-                                        value: `Changed cash to $${new_amount.toLocaleString()}`,
+                                        name: "Old Cash",
+                                        value: `$${current_cash.toLocaleString()}`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: "New Cash",
+                                        value: `$${new_amount.toLocaleString()}`,
+                                        inline: true
                                     }
                                 )
                                 .setTimestamp(new Date())
                                 .setThumbnail(embed.data.thumbnail.url)
                                 .setColor("Blue")
                         ]
-                    })
+                    }, case_id)
                 }).catch((error) => {
                     console.error(error)
                     return embeds.errorEmbed(interaction, "Something went wrong, please try again later.")
@@ -587,7 +599,7 @@ module.exports = {
                                 .setThumbnail(embed.data.thumbnail.url)
                                 .setColor("Blue")
                         ]
-                    })
+                    }, case_id)
                 }).catch((error) => {
                     console.error(error)
                     return embeds.errorEmbed(interaction, "Something went wrong, please try again later.")
