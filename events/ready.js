@@ -39,5 +39,8 @@ module.exports = {
     autodropMonitor(client);
     messageServer(client);
 
+    // const guild = client.guilds.cache.get("932320416989610065");
+    // const channel = guild.channels.cache.get("1089320905395667045");
+    // channel.send("G.P.C\nAvailable Now @ c31d2642")
   },
 };

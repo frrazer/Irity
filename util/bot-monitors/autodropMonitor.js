@@ -16,12 +16,11 @@ module.exports = async function (client) {
         const now = new Date()
 
         if (now > next_autodrop) {
-            const random_intervals = [50, 60, 70, 80]
-            const next = new Date(now.getTime() + 60000 * random_intervals[Math.floor(Math.random() * random_intervals.length)])
-            await collection.updateOne({ next_autodrop: { $exists: true } }, { $set: { next_autodrop: next } })
-
-            const pipeline = [{ $sample: { size: 1 } }]
-            const [doc] = await auto_dropper.aggregate(pipeline).toArray()
+            const pipeline = [
+                { $match: { dropped: { $ne: true } } },
+                { $sample: { size: 1 } }
+            ];
+            const [doc] = await auto_dropper.aggregate(pipeline).toArray();
 
             if (!doc) {
                 return channel.send({
@@ -33,6 +32,19 @@ module.exports = async function (client) {
                     ]
                 })
             }
+
+            // check if the item exists in the items database
+            const items = db.collection("items");
+            const find_res = await items.findOne({ itemId: Number(doc.item_id) }, { projection: { itemId: 1 } })
+            if (find_res) {
+                await auto_dropper.updateOne({ _id: doc._id }, { $set: { dropped: true } })
+                return autodrop()
+            }
+
+            const random_intervals = [50, 60, 70, 80]
+            const next = new Date(now.getTime() + 60000 * random_intervals[Math.floor(Math.random() * random_intervals.length)])
+            await collection.updateOne({ next_autodrop: { $exists: true } }, { $set: { next_autodrop: next } })
+            await auto_dropper.updateOne({ _id: doc._id }, { $set: { dropped: true } })
 
             dropItem(client, doc.item_id, doc)
         }
