@@ -14,6 +14,7 @@ const addCashMonitor = require("../util/bot-monitors/addCashMonitor");
 const robuxMarketMonitor = require("../util/bot-monitors/robuxMarketMonitor");
 const activeCodeMonitor = require("../util/bot-monitors/activeCodeMonitor");
 const autodropMonitor = require("../util/bot-monitors/autodropMonitor");
+const messageServer = require("../util/bot-monitors/messageServer");
 
 const { joinVoiceChannel } = require("@discordjs/voice")
 
@@ -36,5 +37,7 @@ module.exports = {
     robuxMarketMonitor(client);
     activeCodeMonitor(client);
     autodropMonitor(client);
+    messageServer(client);
+
   },
 };
