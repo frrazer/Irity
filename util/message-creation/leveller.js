@@ -1,7 +1,7 @@
 const calculateLevel = require("../calculateLevel");
 const databaseService = require("../../services/databaseService");
 
-async function level(message) {
+async function level(message, client) {
     const isDevMode = process.argv.includes('dev');
     if (isDevMode && !["406163086978842625", "1092037151119654913"].includes(message.author.id)) return;
 
