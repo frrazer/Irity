@@ -65,6 +65,7 @@ module.exports = {
         try {
             require(`../../../util/administration/${subcommand}.js`).execute(interaction, client)
         } catch (error) {
+            console.error(error);
             return embeds.errorEmbed(interaction, "This command is not implemented yet.")
         }
     },
