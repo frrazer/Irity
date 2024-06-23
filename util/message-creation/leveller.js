@@ -45,8 +45,8 @@ async function level(message, client) {
         const { messages, xp, last_message } = tracking;
         let xpToAdd = Math.floor(15 + Math.random() * 11);
 
-        const xp_multiplier_expire = 1718578800
-        const xp_multiplier = 2.5
+        const xp_multiplier_expire = 1719175200
+        const xp_multiplier = 2
 
         if (Date.now() / 1000 > xp_multiplier_expire) {
             xpToAdd *= xp_multiplier;

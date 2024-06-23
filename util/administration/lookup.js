@@ -436,6 +436,10 @@ module.exports = {
                                     {
                                         name: "Reason",
                                         value: reason
+                                    },
+                                    {
+                                        name: "Proof",
+                                        value: proof
                                     }
                                 )
                                 .setTimestamp(new Date())

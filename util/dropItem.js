@@ -7,6 +7,14 @@ const { default: axios } = require("axios");
 
 module.exports = async function (client, item_id, data) {
     try {
+        const database = await getDatabase("ArcadeHaven");
+        const items = database.collection("items");
+        const find_res = await items.findOne({ itemId: Number(item_id) })
+        if (find_res) {
+            await items.deleteOne({ itemId: Number(item_id) });
+            return await module.exports(client, item_id, data);
+        }
+
         const product_info = await getProductInfo(item_id);
         let item_data = {
             itemId: Number(item_id),
@@ -31,14 +39,9 @@ module.exports = async function (client, item_id, data) {
             item_data.offsaleTime = Math.floor(Date.now() / 1000) + stringToDuration(data.date)
         }
 
-        const database = await getDatabase("ArcadeHaven");
-        const items = database.collection("items");
-        const find_res = await items.findOne({ itemId: Number(item_id) })
-        if (find_res) throw new Error("Item already exists in the Marketplace");
-
         await items.insertOne(item_data);
         await postToRoblox(item_id);
-        postDropEmbed(client, item_data, data.user || "406163086978842625");
+        postDropEmbed(client, item_data, data.user || "1024571687724908606");
     } catch (error) {
         console.error("Error dropping item:", error);
     }
