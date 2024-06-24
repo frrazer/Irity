@@ -81,7 +81,8 @@ async function execute(message, client) {
         item_id: Number(item_id),
         limited_type: is_duration ? "limited" : "unique",
         price: Number(price),
-        [is_duration ? "date" : "quantity"]: is_duration ? quantity : Number(quantity)
+        [is_duration ? "date" : "quantity"]: is_duration ? quantity : Number(quantity),
+        user: message.author.id,
     }
 
     auto_dropper.insertOne(doc);
