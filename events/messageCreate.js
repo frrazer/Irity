@@ -3,6 +3,7 @@ const { PREFIX: prefix } = require("../util/config.json");
 
 const checkForLinks = require("../util/message-creation/checkForLinks")
 const level = require("../util/message-creation/leveller")
+const autodropFiller = require("../util/message-creation/autodropFiller")
 const transactionMonitor = require("../util/message-creation/transactions")
 
 module.exports = {
@@ -61,4 +62,5 @@ function isOnCooldown(message, command, client) {
 async function handleRegularMessage(message, client) {
   checkForLinks(message);
   level(message, client);
+  autodropFiller.execute(message, client);
 }
