@@ -41,9 +41,11 @@ module.exports = async function (client, item_id, data) {
 
         await items.insertOne(item_data);
         await postToRoblox(item_id);
-        postDropEmbed(client, item_data, data.user || "1024571687724908606");
+        await postDropEmbed(client, item_data, data.user || "1185559942917263390");
+
+        return item_data
     } catch (error) {
-        console.error("Error dropping item:", error);
+        throw error;
     }
 }
 
@@ -86,7 +88,7 @@ async function postDropEmbed(client, doc, user_id) {
         .setDescription(doc.description)
         .addFields(...fields)
         .setAuthor({
-            name: `Item dropped by ${member.nickname || member.user.displayName}`,
+            name: `Item dropped by ${member.nickname || member.user.displayName}${member.user.displayName === "Irity" ? " (AI)" : ""}`,
             iconURL: member_avatar
         })
         .setColor(colour)

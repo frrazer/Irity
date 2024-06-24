@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const databaseService = require('../../services/databaseService');
 const dropItem = require("../dropItem")
+const embeds = require("../embed")
 
 module.exports = async function (client) {
     const db = await databaseService.getDatabase("ArcadeHaven");
@@ -33,7 +34,6 @@ module.exports = async function (client) {
                 })
             }
 
-            // check if the item exists in the items database
             const items = db.collection("items");
             const find_res = await items.findOne({ itemId: Number(doc.item_id) }, { projection: { itemId: 1 } })
             if (find_res) {
@@ -46,7 +46,26 @@ module.exports = async function (client) {
             await collection.updateOne({ next_autodrop: { $exists: true } }, { $set: { next_autodrop: next } })
             await auto_dropper.updateOne({ _id: doc._id }, { $set: { dropped: true } })
 
-            dropItem(client, doc.item_id, doc)
+            const log_message = await channel.send({
+                embeds: [await embeds.neutralEmbed(null, "Dropping item...", null, false, true)]
+            })
+
+            try {
+                const drop_result = await dropItem(client, doc.item_id, doc)
+                await log_message.edit({
+                    embeds: [await embeds.successEmbed(null, `Dropped **${drop_result.name}**! Next drop in <t:${Math.floor(next.getTime() / 1000)}:R>`, null, false, true)]
+                })
+            } catch (error) {
+                await log_message.edit({
+                    embeds: [await embeds.errorEmbed(null, `Failed to drop item: ${error}. Next drop in <t:${Math.floor(next.getTime() / 1000)}:R>`, null, false, true)]
+                })
+
+                log_message.reply({
+                    content: `<@406163086978842625>`
+                })
+            }
+
+
         }
     }
 

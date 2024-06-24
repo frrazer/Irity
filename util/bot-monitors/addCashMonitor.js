@@ -13,6 +13,7 @@ module.exports = async function (client) {
 
             const channel = await client.channels.cache.get("1251294803518291998");
             let message = ""
+            let value = 0
 
             for (const log of logs) {
                 const username = log.player
@@ -22,17 +23,24 @@ module.exports = async function (client) {
                 const prefix = `${amount > 80000000 ? "@everyone" : ""}`
 
                 message += `${prefix} \`${username}\` **$${amount.toLocaleString()}** \`${context}\`  <t:${date}:R>\n`
+                value -= amount
             }
 
             await channel.send({
                 content: message
             });
-            
+
             await collection.updateMany({
                 _id: { $in: logs.map(log => log._id) }
             }, {
                 $set: { logged: true }
             });
+
+            await collection.updateOne({
+                context: "global",
+            }, {
+                $inc: { amount: value }
+            })
         } catch (error) {
             console.error(error);
         }
