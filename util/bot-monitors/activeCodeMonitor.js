@@ -36,8 +36,12 @@ module.exports = async function (client) {
                 }
             }
 
-            if (message.content !== content) {
-                message.edit(content)
+            function normalizeString(str) {
+                return str.trim().replace(/\s+/g, ' ');
+            }
+
+            if (normalizeString(message.content) !== normalizeString(content)) {
+                message.edit(content);
             }
         } catch (error) {
             console.error(error);

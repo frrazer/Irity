@@ -143,6 +143,13 @@ module.exports = {
                         text: `Sorted by ${method === "value" ? "Value" : (method === "quantity" ? "Quantity" : "Best Items")} | Total Value: $${abriviateNumber(bot_total_value)} | Total Items: ${total_items.toLocaleString()}`,
                     })
 
+                const cash_logs = database.collection("cash_logs")
+                const bot_cash = await cash_logs.findOne({ context: "global" })
+                
+                embed.setAuthor({
+                    name: `Bot Cash: $${abriviateNumber(bot_cash.amount)}`
+                })
+
                 let descripion = "";
                 items.slice(0, 15).forEach((item, index) => {
                     if (method === "value") {
