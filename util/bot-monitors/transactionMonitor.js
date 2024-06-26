@@ -57,16 +57,6 @@ async function handleRAPChangesChannel(message) {
         type: "marketplace"
     };
 
-    const user_database = await databaseService.getDatabase("DiscordServer");
-    const user_collection = user_database.collection("CasinoEmpireLevelling");
-    const seller = await user_collection.findOne({ user_id: buyer_discord_id });
-
-    if (seller) {
-        if (seller.settings.sale_notifications) {
-            handleUserNotification(message, transaction, item.name);
-        }
-    }
-
 
     await saveTransaction(transaction);
 }
@@ -102,6 +92,14 @@ async function saveTransaction(transaction) {
 async function handleUserNotification(message, transaction, item_name) {
     try {
         const seller_discord_id = await getDiscordFromRoblox(client, transaction.seller_id);
+        const user_database = await databaseService.getDatabase("DiscordServer");
+        const user_collection = user_database.collection("CasinoEmpireLevelling");
+        const seller = await user_collection.findOne({ user_id: buyer_discord_id });
+
+        if (seller && seller.settings.sale_notifications !== true) {
+            return;
+        }
+
         const seller_user = await client.users.fetch(seller_discord_id);
         if (!seller_user) return;
 
