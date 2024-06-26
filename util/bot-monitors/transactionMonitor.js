@@ -94,6 +94,8 @@ async function handleUserNotification(message, transaction, item_name) {
 
     try {
         const [_, seller_discord_id] = await getDiscordFromRoblox(transaction.seller_id);
+        if (!seller_discord_id) return;
+
         const user_database = await databaseService.getDatabase("DiscordServer");
         const user_collection = user_database.collection("CasinoEmpireLevelling");
         const seller = await user_collection.findOne({ user_id: seller_discord_id });
@@ -107,6 +109,7 @@ async function handleUserNotification(message, transaction, item_name) {
 
         const embed = new EmbedBuilder()
             .setTitle(`Your ${item_name} sold!`)
+            .setDescription(`[Link to RAP Changes](${message.url})`)
             .addFields([
                 message.embeds[0].fields[2],
                 message.embeds[0].fields[3]
