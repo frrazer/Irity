@@ -3,7 +3,8 @@ module.exports = {
     aliases: [
         "administration/lookup/gameban",
         "administration/lookup/edit",
-        "administration/lookup/unban"
+        "administration/lookup/unban",
+        "administration/lookup/transfer"
     ],
     async execute(interaction, client) {
         if (interaction.user.id !== interaction.message.interaction.user.id)
