@@ -10,6 +10,14 @@ const settings = {
             option
                 .setName("value")
                 .setDescription("The value to set.")
+                .setRequired(true)),
+    "sale_notifications": new SlashCommandSubcommandBuilder()
+        .setName("sale_notifications")
+        .setDescription("Toggle sale notifications.")
+        .addBooleanOption(option =>
+            option
+                .setName("value")
+                .setDescription("The value to set.")
                 .setRequired(true))
 }
 
@@ -37,6 +45,26 @@ module.exports = {
                 embeds.successEmbed(interaction, `Level up notifications have been **${value ? "enabled" : "disabled"}**.`, null, true);
             } else if (result.modifiedCount === 0 && result.matchedCount === 1) {
                 embeds.errorEmbed(interaction, `Your level up notification settings are already ${value ? "enabled" : "disabled"}.`, null, true);
+            } else {
+                embeds.errorEmbed(interaction, "An error occurred while updating your settings. Please try again later.", null, true);
+            }
+        }
+        else if (subcommand === "sale_notifications") {
+            const value = interaction.options.getBoolean("value");
+            const database = await databaseService.getDatabase("DiscordServer");
+            const collection = database.collection("CasinoEmpireLevelling");
+            const authorId = interaction.user.id;
+
+            const result = await collection.updateOne({ user_id: authorId }, {
+                $set: {
+                    "settings.sale_notifications": value,
+                }
+            });
+
+            if (result.modifiedCount === 1) {
+                embeds.successEmbed(interaction, `Sale notifications have been **${value ? "enabled" : "disabled"}**.`, null, true);
+            } else if (result.modifiedCount === 0 && result.matchedCount === 1) {
+                embeds.errorEmbed(interaction, `Your sale notification settings are already ${value ? "enabled" : "disabled"}.`, null, true);
             } else {
                 embeds.errorEmbed(interaction, "An error occurred while updating your settings. Please try again later.", null, true);
             }
