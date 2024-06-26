@@ -1,5 +1,8 @@
 const databaseService = require("../../services/databaseService");
 const crypto = require('crypto');
+const { EmbedBuilder } = require("discord.js");
+const getDiscordFromRoblox = require("../getDiscordFromRoblox");
+const { getUsernameFromId } = require("noblox.js")
 
 async function transactionMonitor(message) {
     const allowed_channels = ["1112734635210846310", "1142738352731332689"];
@@ -36,7 +39,7 @@ async function handleRAPChangesChannel(message) {
 
     const database = await databaseService.getDatabase("ArcadeHaven");
     const collection = database.collection("items");
-    const item = await collection.findOne({ name: item_name }, { projection: { itemId: 1 } });
+    const item = await collection.findOne({ name: item_name }, { projection: { itemId: 1, name: 1 } });
 
     if (!item) {
         console.error("Failed to find item:", item_name);
@@ -54,6 +57,7 @@ async function handleRAPChangesChannel(message) {
         type: "marketplace"
     };
 
+    handleUserNotification(message, transaction, item_name);
     await saveTransaction(transaction);
 }
 
@@ -82,6 +86,37 @@ async function saveTransaction(transaction) {
         await collection.insertOne(transaction);
     } catch (error) {
         console.error("Failed to save transaction:", error);
+    }
+}
+
+async function handleUserNotification(message, transaction, item_name) {
+    const client = require("../../bot").client
+
+    try {
+        const [_, seller_discord_id] = await getDiscordFromRoblox(transaction.seller_id);
+        const user_database = await databaseService.getDatabase("DiscordServer");
+        const user_collection = user_database.collection("CasinoEmpireLevelling");
+        const seller = await user_collection.findOne({ user_id: seller_discord_id });
+
+        if (seller && seller.settings.sale_notifications !== true) {
+            return;
+        }
+
+        const seller_user = await client.users.fetch(seller_discord_id);
+        if (!seller_user) return;
+
+        const embed = new EmbedBuilder()
+            .setTitle(`Your ${item_name} sold!`)
+            .addFields([
+                message.embeds[0].fields[2],
+                message.embeds[0].fields[3]
+            ])
+            .setColor("Blue")
+            .setThumbnail(message.embeds[0].thumbnail.url)
+
+        await seller_user.send({ embeds: [embed] });
+    } catch (error) {
+        console.error("Failed to send user notification:", error);
     }
 }
 
