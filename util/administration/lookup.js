@@ -66,19 +66,29 @@ module.exports = {
         if (!user_id) return embeds.errorEmbed(interaction, "User not found.")
 
         let reference = options ? interaction.id : interaction.message.interaction.id
+        let ban_status
+        let thumbnail
+
+        try {
+            ban_status = await robloxService.getBanStatus(`MAIN_${user_id}`)
+        } catch (error) {
+            ban_status = "error"
+        }
+
+        try {
+            thumbnail = (await getPlayerThumbnail(user_id, "180x180", "png", false, "headshot"))[0].imageUrl
+        } catch (error) {
+            thumbnail = null
+        }
+
         robloxService.getDatastoreEntry(`MAIN_${user_id}`, reference).then(async (data) => {
+            console.log(`Fetched entry for key MAIN_${user_id} from Datastore`, data)
+
             const user_data = data.data.Data
             const meta_data = data.data.MetaData
             const cash = Math.floor(user_data.Cash)
             const profit = Math.floor(user_data.Profit)
             const wagered = Math.floor(user_data.Wagered)
-            let thumbnail
-
-            try {
-                thumbnail = (await getPlayerThumbnail(user_id, "180x180", "png", false, "headshot"))[0].imageUrl
-            } catch (error) {
-                thumbnail = null
-            }
 
             const embed = new EmbedBuilder()
                 .setTitle(`Lookup for ${username}`)
@@ -132,7 +142,7 @@ module.exports = {
                 })
             }
 
-            if (user_data.Moderation.BanData2.Banned) {
+            if (ban_status && ban_status.active) {
                 embed.setAuthor({
                     name: "This user is banned from Arcade Haven",
                     iconURL: "https://cdn.discordapp.com/emojis/1249473498062000209.webp"
@@ -143,6 +153,19 @@ module.exports = {
                     .setLabel("Unban")
                     .setEmoji("<:unban:1252630527731564666>")
                     .setStyle(ButtonStyle.Success)
+
+                if (ban_status.inherited) {
+                    components[0].setDisabled(true)
+                    embed.setAuthor({
+                        name: "This user is an alternate account of a banned user.",
+                        iconURL: "https://cdn.discordapp.com/emojis/1249473498062000209.webp"
+                    })
+                }
+            } else if (ban_status === "error") {
+                embed.setAuthor({
+                    name: "I was unable to check the ban status of this user.",
+                    iconURL: "https://cdn.discordapp.com/emojis/1182425203679170600.webp"
+                })
             }
 
             const admin_roles = ["1069023487647301692", "1113868122311639050", "1180090434744229988", "1213276024020934666", "1249703065632641045"]
@@ -158,13 +181,58 @@ module.exports = {
                 await interaction.editReply({ embeds: [embed], components: [action_row] })
             }
         }).catch((error) => {
-            console.error(error)
-            let errorMessage
             if (error.message === "404 NOT_FOUND Entry not found in the datastore.") {
-                errorMessage = "The provided user does not have any data on record."
+                const embed = new EmbedBuilder()
+                    .setTitle(`Lookup for ${username}`)
+                    .setDescription("This user has never played Arcade Haven before.")
+                    .setThumbnail(thumbnail)
+                    .setColor("Blue")
+                    .setFooter({
+                        text: "Last updated ",
+                    })
+                    .setTimestamp(new Date())
+
+                const action_row = new ActionRowBuilder()
+                const components = [
+                    new ButtonBuilder()
+                        .setCustomId("administration/lookup/gameban")
+                        .setLabel("Ban")
+                        .setEmoji("<:banicon:1252425649923293204>")
+                        .setStyle(ButtonStyle.Danger),
+                ]
+
+                if (ban_status && ban_status.active) {
+                    embed.setAuthor({
+                        name: "This user is banned from Arcade Haven",
+                        iconURL: "https://cdn.discordapp.com/emojis/1249473498062000209.webp"
+                    })
+
+                    components[0] = new ButtonBuilder()
+                        .setCustomId("administration/lookup/unban")
+                        .setLabel("Unban")
+                        .setEmoji("<:unban:1252630527731564666>")
+                        .setStyle(ButtonStyle.Success)
+
+                    if (ban_status.inherited) {
+                        components[0].setDisabled(true)
+                        embed.setAuthor({
+                            name: "This user is an alternate account of a banned user.",
+                            iconURL: "https://cdn.discordapp.com/emojis/1249473498062000209.webp"
+                        })
+                    }
+                } else if (ban_status === "error") {
+                    embed.setAuthor({
+                        name: "I was unable to check the ban status of this user.",
+                        iconURL: "https://cdn.discordapp.com/emojis/1182425203679170600.webp"
+                    })
+                }
+
+                action_row.addComponents(...components)
+                return interaction.editReply({ embeds: [embed], components: [action_row] })
             }
 
-            return embeds.errorEmbed(interaction, errorMessage || "Something went wrong, please try again later.")
+            console.error(error)
+            return embeds.errorEmbed(interaction, "Something went wrong, please try again later.")
         })
     },
 
@@ -173,13 +241,6 @@ module.exports = {
         const database = await databaseService.getDatabase("DiscordServer");
         const collection = database.collection("RobloxServiceCache");
         const document = await collection.findOne({ reference: interaction.message.interaction.id });
-
-        if (!document) {
-            return interaction.reply({
-                embeds: [await embeds.errorEmbed(interaction, "This interaction has expired.", null, false, true)],
-                ephemeral: true
-            });
-        }
 
         const handleHistoryNavigation = async (currentPage, direction, username) => {
             const allBets = Object.entries(document.value.data.Data.Logs.Bets).flatMap(([key, bets]) => bets.map(bet => ({ mode: key, ...bet })));
@@ -243,11 +304,13 @@ module.exports = {
                         new ActionRowBuilder()
                             .addComponents(
                                 new TextInputBuilder()
-                                    .setLabel("Reason")
-                                    .setPlaceholder("Enter a reason for the ban")
+                                    .setLabel("Rule Violation")
+                                    .setPlaceholder("Which rule number did they break?")
                                     .setCustomId("reason")
                                     .setRequired(true)
                                     .setStyle(TextInputStyle.Short)
+                                    .setMinLength(1)
+                                    .setMaxLength(2)
                             ),
                         new ActionRowBuilder()
                             .addComponents(
@@ -293,26 +356,61 @@ module.exports = {
                 interaction.showModal(editModal);
                 break;
             case "administration/lookup/history":
+                if (!document) {
+                    return interaction.reply({
+                        embeds: [await embeds.errorEmbed(interaction, "This interaction has expired.", null, false, true)],
+                        ephemeral: true
+                    });
+                }
+
                 const lookupUsername = interaction.message.embeds[0].title.split(" ")[2];
                 await handleHistoryNavigation(1, 0, lookupUsername);
                 break;
             case "administration/lookup/history/previous":
+                if (!document) {
+                    return interaction.reply({
+                        embeds: [await embeds.errorEmbed(interaction, "This interaction has expired.", null, false, true)],
+                        ephemeral: true
+                    });
+                }
+
                 const prevPage = parseInt(interaction.message.embeds[0].footer.text.split(" ")[1].split("/")[0]);
                 const prevUsername = interaction.message.embeds[0].title.split(" ")[0].slice(0, -2);
                 await handleHistoryNavigation(prevPage, -1, prevUsername);
                 break;
             case "administration/lookup/history/previous-far":
+                if (!document) {
+                    return interaction.reply({
+                        embeds: [await embeds.errorEmbed(interaction, "This interaction has expired.", null, false, true)],
+                        ephemeral: true
+                    });
+                }
+
                 const farPrevPage = parseInt(interaction.message.embeds[0].footer.text.split(" ")[1].split("/")[0]);
                 const prevTotalPages = parseInt(interaction.message.embeds[0].footer.text.split(" ")[1].split("/")[1]);
                 const farPrevUsername = interaction.message.embeds[0].title.split(" ")[0].slice(0, -2);
                 await handleHistoryNavigation(farPrevPage, -(farPrevPage) + 1, farPrevUsername);
                 break;
             case "administration/lookup/history/next":
+                if (!document) {
+                    return interaction.reply({
+                        embeds: [await embeds.errorEmbed(interaction, "This interaction has expired.", null, false, true)],
+                        ephemeral: true
+                    });
+                }
+
                 const nextPage = parseInt(interaction.message.embeds[0].footer.text.split(" ")[1].split("/")[0]);
                 const nextUsername = interaction.message.embeds[0].title.split(" ")[0].slice(0, -2);
                 await handleHistoryNavigation(nextPage, 1, nextUsername);
                 break;
             case "administration/lookup/history/next-far":
+                if (!document) {
+                    return interaction.reply({
+                        embeds: [await embeds.errorEmbed(interaction, "This interaction has expired.", null, false, true)],
+                        ephemeral: true
+                    });
+                }
+
                 const farNextPage = parseInt(interaction.message.embeds[0].footer.text.split(" ")[1].split("/")[0]);
                 const farTotalPages = parseInt(interaction.message.embeds[0].footer.text.split(" ")[1].split("/")[1]);
                 const farNextUsername = interaction.message.embeds[0].title.split(" ")[0].slice(0, -2);
@@ -349,23 +447,20 @@ module.exports = {
         const collection = database.collection("RobloxServiceCache");
         const document = await collection.findOne({ reference: interaction.message.interaction.id });
 
-        if (!document) {
-            return interaction.reply({
-                embeds: [await embeds.errorEmbed(interaction, "This interaction has expired.", null, false, true)],
-                ephemeral: true
-            });
-        }
-
         switch (customId) {
             case "administration/lookup/gameban":
                 const reason = interaction.fields.getTextInputValue("reason") || "No reason provided";
                 const proof = interaction.fields.getTextInputValue("proof") || "No proof provided";
                 const duration = interaction.fields.getTextInputValue("duration") || "perm"
                 const username = interaction.message.embeds[0].title.split(" ")[2]
-                const ban_user_id = document.value.data.UserIds[0]
+                const ban_user_id = document.UserId
                 await interaction.deferReply({ ephemeral: true });
 
-                robloxService.gameBan(`MAIN_${ban_user_id}`, reason, duration, interaction.user.username).then(async (success) => {
+                if (isNaN(Number(reason))) {
+                    return embeds.errorEmbed(interaction, "Please provide a valid rule number.")
+                }
+
+                robloxService.gameBan(`MAIN_${ban_user_id}`, reason, duration, true, interaction.user.username).then(async (success) => {
                     const embed = EmbedBuilder.from(interaction.message.embeds[0])
                     embed.setAuthor({
                         name: "This user is banned from Arcade Haven",
@@ -394,6 +489,10 @@ module.exports = {
                     const admin_roles = ["1069023487647301692", "1113868122311639050", "1180090434744229988", "1213276024020934666", "1249703065632641045"]
                     if (!interaction.member.roles.cache.some(role => admin_roles.includes(role.id))) {
                         components[1].setDisabled(true)
+                    }
+
+                    if (document.value === null) {
+                        components.splice(1, 2)
                     }
 
                     action_row.addComponents(...components)
@@ -432,10 +531,12 @@ module.exports = {
                                     {
                                         name: "Target",
                                         value: `<:singleright:1252703372998611085> [\`@${username}\`](https://www.roblox.com/users/${ban_user_id}/profile)`,
+                                        inline: true
                                     },
                                     {
-                                        name: "Reason",
-                                        value: reason
+                                        name: "Rule Violation",
+                                        value: reason,
+                                        inline: true
                                     },
                                     {
                                         name: "Proof",
@@ -455,7 +556,7 @@ module.exports = {
                 break
             case "administration/lookup/edit":
                 const expression = interaction.fields.getTextInputValue("cash")
-                const edit_user_id = document.value.data.UserIds[0]
+                const edit_user_id = document.UserId
                 const edit_username = interaction.message.embeds[0].title.split(" ")[2]
                 await interaction.deferReply({ ephemeral: true });
                 const new_amount = parseInt(await calculateExpression(expression))
@@ -527,7 +628,7 @@ module.exports = {
                 break
             case "administration/lookup/unban":
                 const unban_reason = interaction.fields.getTextInputValue("reason") || "No reason provided";
-                const unban_user_id = document.value.data.UserIds[0]
+                const unban_user_id = document.UserId
                 const unban_username = interaction.message.embeds[0].title.split(" ")[2]
                 await interaction.deferReply({ ephemeral: true });
 
@@ -557,6 +658,10 @@ module.exports = {
                     const admin_roles = ["1069023487647301692", "1113868122311639050", "1180090434744229988", "1213276024020934666", "1249703065632641045"]
                     if (!interaction.member.roles.cache.some(role => admin_roles.includes(role.id))) {
                         components[1].setDisabled(true)
+                    }
+
+                    if (document.value === null) {
+                        components.splice(1, 2)
                     }
 
                     action_row.addComponents(...components)
