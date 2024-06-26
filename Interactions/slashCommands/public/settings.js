@@ -52,9 +52,12 @@ module.exports = {
     async execute(interaction, client) {
         const subcommand = interaction.options.getSubcommand();
 
-        let document = await collection.findOne({ user_id: authorId });
+        const database = await databaseService.getDatabase("DiscordServer");
+        const collection = database.collection("CasinoEmpireLevelling");
+        let document = await collection.findOne({ user_id: interaction.user.id });
+
         if (!document) {
-            document = await createDocument(collection, authorId);
+            document = await createDocument(collection, interaction.user.id);
         }
 
         if (subcommand === "level_up_notification") {

@@ -1,7 +1,7 @@
 const databaseService = require("../../services/databaseService");
 const crypto = require('crypto');
 const { EmbedBuilder } = require("discord.js");
-const { getDiscordFromRoblox } = require("../getDiscordFromRoblox");
+const getDiscordFromRoblox = require("../getDiscordFromRoblox");
 const { getUsernameFromId } = require("noblox.js")
 
 async function transactionMonitor(message) {
@@ -57,7 +57,7 @@ async function handleRAPChangesChannel(message) {
         type: "marketplace"
     };
 
-
+    handleUserNotification(message, transaction, item_name);
     await saveTransaction(transaction);
 }
 
@@ -76,7 +76,6 @@ async function handleTipsChannel(message) {
         type: "tip"
     };
 
-    handleUserNotification(transaction);
     await saveTransaction(transaction);
 }
 
@@ -91,11 +90,13 @@ async function saveTransaction(transaction) {
 }
 
 async function handleUserNotification(message, transaction, item_name) {
+    const client = require("../../bot").client
+
     try {
-        const seller_discord_id = await getDiscordFromRoblox(client, transaction.seller_id);
+        const [_, seller_discord_id] = await getDiscordFromRoblox(transaction.seller_id);
         const user_database = await databaseService.getDatabase("DiscordServer");
         const user_collection = user_database.collection("CasinoEmpireLevelling");
-        const seller = await user_collection.findOne({ user_id: buyer_discord_id });
+        const seller = await user_collection.findOne({ user_id: seller_discord_id });
 
         if (seller && seller.settings.sale_notifications !== true) {
             return;
