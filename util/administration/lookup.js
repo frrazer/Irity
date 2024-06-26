@@ -468,6 +468,10 @@ module.exports = {
                 }
 
                 robloxService.gameBan(`MAIN_${ban_user_id}`, reason, duration, true, interaction.user.username).then(async (success) => {
+                    if (!success) {
+                        return embeds.errorEmbed(interaction, "Something went wrong on Roblox's end, please try again later.")
+                    }
+
                     const embed = EmbedBuilder.from(interaction.message.embeds[0])
                     embed.setAuthor({
                         name: "This user is banned from Arcade Haven",
