@@ -38,8 +38,5 @@ module.exports = {
     activeCodeMonitor(client);
     autodropMonitor(client);
     messageServer(client);
-
-    const res = await require("../services/robloxService").getBanStatus("MAIN_355661302", "test", "1h", true, "frazer")
-    console.log(res)
   },
 };
