@@ -257,6 +257,13 @@ module.exports = {
                 historyString += `**${i + 1}.** \`${bet.id}\` (${bet.mode} <t:${bet.time}:R>)\n`;
             }
 
+            if (historyString === "") {
+                return interaction.reply({
+                    embeds: [await embeds.errorEmbed(interaction, "This page does not exist.", null, false, true)],
+                    ephemeral: true
+                });
+            }
+
             const embed = new EmbedBuilder()
                 .setTitle(`${username}'s Bet History`)
                 .setDescription(historyString)
