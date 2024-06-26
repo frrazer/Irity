@@ -47,7 +47,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("settings")
         .setDescription("Change your settings.")
-        .addSubcommand(settings.level_up_notification),
+        .addSubcommand(settings.level_up_notification)
+        .addSubcommand(settings.sale_notifications),
     async execute(interaction, client) {
         const subcommand = interaction.options.getSubcommand();
 
