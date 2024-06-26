@@ -2,6 +2,7 @@ const { getDatastoreEntry, setDatastoreEntry, setAPIKey } = require("noblox.js")
 const databaseService = require("./databaseService")
 const { stringToDuration } = require("../util/functions")
 const { EmbedBuilder } = require("@discordjs/builders")
+const axios = require("axios")
 
 module.exports = {
     async getDatastoreEntry(key, reference) {
@@ -18,28 +19,52 @@ module.exports = {
                     await cache.updateOne({ key }, { $set: { reference } })
                 }
 
-                return cachedData.value
+                if (cachedData.value === null) {
+                    throw new Error("404 NOT_FOUND Entry not found in the datastore.")
+                } else {
+                    return cachedData.value
+                }
             }
         }
 
         await setAPIKey(process.env.DATASTORE_KEY)
-        const entry = await getDatastoreEntry(4570608156, process.env.DATASTORE_NAME, key)
+        let entry
 
-        if (entry) {
-            let doc = {
+        try {
+            entry = await getDatastoreEntry(4570608156, process.env.DATASTORE_NAME, key)
+            console.log(`Fetched entry for key ${key} from Datastore`)
+
+            if (entry) {
+                let doc = {
+                    key,
+                    value: entry,
+                    expiry: Date.now() + 60000,
+                }
+
+                if (reference) {
+                    doc.reference = reference
+                }
+
+                await cache.insertOne({
+                    ...doc,
+                    UserId: key.split("_")[1]
+                })
+
+                return entry
+            } else {
+                throw new Error("No entry found")
+            }
+        } catch (error) {
+            await cache.insertOne({
                 key,
-                value: entry,
+                value: null,
                 expiry: Date.now() + 60000,
-            }
+                UserId: key.split("_")[1],
+                ...(reference ? { reference } : {})
+            })
 
-            if (reference) {
-                doc.reference = reference
-            }
-
-            await cache.insertOne(doc)
+            throw error
         }
-
-        return entry
     },
 
     async setDatastoreEntry(key, value) {
@@ -48,7 +73,7 @@ module.exports = {
         return setDatastoreEntry(4570608156, process.env.DATASTORE_NAME, key, value, undefined, undefined, undefined, [user_id])
     },
 
-    async gameBan(key, reason, duration, admin) {
+    async gameBan(key, rule_violation, duration, ban_alts, admin) {
         let true_duration
         if (duration === "perm") {
             true_duration = -1
@@ -56,41 +81,83 @@ module.exports = {
             true_duration = stringToDuration(duration)
         }
 
-        await setAPIKey(process.env.ROBLOX_API_KEY)
-        let entry = await getDatastoreEntry(4570608156, process.env.DATASTORE_NAME, key)
-        if (!entry) return false
+        const user_id = parseInt(key.split("_")[1]);
+        const url = `https://apis.roblox.com/cloud/v2/universes/4570608156/user-restrictions/${user_id}?updateMask=gameJoinRestriction`;
 
-        entry.data.Data.Moderation.BanData2 = {}
-        entry.data.Data.Moderation.AdminName = admin
-        entry.data.Data.Moderation.BanData2.Reason = reason
-        entry.data.Data.Moderation.BanData2.Banned = true
-        entry.data.Data.Moderation.BanData2.EpochTime = true_duration === -1 ? -1 : Math.floor(Date.now() / 1000) + true_duration
-        delete entry.data.MetaData.ActiveSession
+        const body = {
+            gameJoinRestriction: {
+                active: true,
+                duration: `${true_duration}s`,
+                privateReason: "Check Irity cases for more information",
+                displayReason: `We believe you have violated rule ${rule_violation}. You can appeal this ban by joining our Discord server.`,
+                excludeAltAccounts: !ban_alts,
+                inherited: true,
+                startTime: new Date().toISOString()
+            }
+        };
 
-        await this.setDatastoreEntry(key, entry.data)
+        try {
+            await axios({
+                method: "PATCH",
+                url: url,
+                headers: {
+                    "x-api-key": process.env.BAN_API_KEY,
+                    "Content-Type": "application/json",
+                },
+                data: body
+            });
 
-        const database = await databaseService.getDatabase("DiscordServer")
-        const cache = database.collection("RobloxServiceCache")
-        await cache.updateOne({ key }, { $set: { value: entry, expiry: Date.now() + 60000 } })
-
-        return true
+            return true
+        } catch (error) {
+            return false
+        }
     },
 
     async gameUnban(key) {
-        await setAPIKey(process.env.ROBLOX_API_KEY)
-        let entry = await getDatastoreEntry(4570608156, process.env.DATASTORE_NAME, key)
-        if (!entry) return false
+        const user_id = parseInt(key.split("_")[1]);
+        const url = `https://apis.roblox.com/cloud/v2/universes/4570608156/user-restrictions/${user_id}?updateMask=gameJoinRestriction`;
 
-        entry.data.Data.Moderation.BanData2.Banned = false
-        delete entry.data.MetaData.ActiveSession
+        const body = {
+            gameJoinRestriction: {
+                active: false
+            }
+        };
 
-        await this.setDatastoreEntry(key, entry.data)
+        try {
+            await axios({
+                method: "PATCH",
+                url: url,
+                headers: {
+                    "x-api-key": process.env.BAN_API_KEY,
+                    "Content-Type": "application/json",
+                },
+                data: body
+            });
 
-        const database = await databaseService.getDatabase("DiscordServer")
-        const cache = database.collection("RobloxServiceCache")
-        await cache.updateOne({ key }, { $set: { value: entry, expiry: Date.now() + 60000 } })
+            return true
+        } catch (error) {
+            return false
+        }
+    },
 
-        return true
+    async getBanStatus(key) {
+        const user_id = parseInt(key.split("_")[1]);
+        const url = `https://apis.roblox.com/cloud/v2/universes/4570608156/user-restrictions/${user_id}`;
+
+        try {
+            const response = await axios({
+                method: "GET",
+                url: url,
+                headers: {
+                    "x-api-key": process.env.BAN_API_KEY,
+                    "Content-Type": "application/json",
+                }
+            });
+
+            return response.data.gameJoinRestriction
+        } catch (error) {
+            return false
+        }
     },
 
     async setCash(key, amount) {

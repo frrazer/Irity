@@ -39,8 +39,7 @@ module.exports = {
     autodropMonitor(client);
     messageServer(client);
 
-    // const guild = client.guilds.cache.get("932320416989610065");
-    // const channel = guild.channels.cache.get("1089320905395667045");
-    // channel.send("G.P.C\nAvailable Now @ c31d2642")
+    const res = await require("../services/robloxService").getBanStatus("MAIN_355661302", "test", "1h", true, "frazer")
+    console.log(res)
   },
 };
