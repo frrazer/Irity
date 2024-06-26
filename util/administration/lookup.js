@@ -4,6 +4,7 @@ const databaseService = require("../../services/databaseService")
 const embeds = require("../../util/embed")
 const { abbreviateNumber, calculateExpression } = require("../functions")
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle } = require("discord.js")
+const fs = require("fs")
 
 async function createCase(data) {
     const database = await databaseService.getDatabase("ArcadeHaven")
@@ -124,6 +125,11 @@ module.exports = {
                     .setEmoji("<:banicon:1252425649923293204>")
                     .setStyle(ButtonStyle.Danger),
                 new ButtonBuilder()
+                    .setCustomId("administration/lookup/transfer")
+                    .setLabel("Transfer")
+                    .setEmoji("<:wipe:1255634882453831680>")
+                    .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
                     .setCustomId("administration/lookup/edit")
                     .setLabel("Edit Cash")
                     .setEmoji("<:editdataicon:1252425167699837028>")
@@ -132,6 +138,11 @@ module.exports = {
                     .setCustomId("administration/lookup/history")
                     .setLabel("View History")
                     .setEmoji("<:recentbets:1252425177975881728>")
+                    .setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder()
+                    .setCustomId("administration/lookup/getraw")
+                    .setLabel("Download")
+                    .setEmoji("<:getraw:1255636555674943589>")
                     .setStyle(ButtonStyle.Secondary)
             ]
 
@@ -171,6 +182,7 @@ module.exports = {
             const admin_roles = ["1069023487647301692", "1113868122311639050", "1180090434744229988", "1213276024020934666", "1249703065632641045"]
             if (!interaction.member.roles.cache.some(role => admin_roles.includes(role.id))) {
                 components[1].setDisabled(true)
+                components[2].setDisabled(true)
             }
 
             action_row.addComponents(...components)
@@ -294,7 +306,12 @@ module.exports = {
                 new ButtonBuilder()
                     .setCustomId("administration/lookup/history/close")
                     .setEmoji("<:close:1252438815189241897>")
-                    .setStyle(ButtonStyle.Danger)
+                    .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
+                    .setCustomId("administration/lookup/getraw")
+                    .setLabel("Download")
+                    .setEmoji("<:getraw:1255636555674943589>")
+                    .setStyle(ButtonStyle.Secondary)
             ];
 
             const actionRow = new ActionRowBuilder().addComponents(...components);
@@ -444,6 +461,66 @@ module.exports = {
                     )
 
                 interaction.showModal(unbanModal);
+            case "administration/lookup/getraw":
+                try {
+                    await interaction.deferReply()
+
+                    const raw = JSON.stringify(document.value, null, 2);
+                    const doc_id = require("crypto").randomBytes(4).toString("hex");
+                    const path = `/var/www/irity-content/documents/${doc_id}`;
+                    fs.writeFileSync(path, raw);
+
+                    interaction.editReply({
+                        components: [
+                            new ActionRowBuilder().addComponents(
+                                new ButtonBuilder()
+                                    .setURL(`https://cdn.noxirity.com/${doc_id}`)
+                                    .setStyle(ButtonStyle.Link)
+                                    .setLabel("Download")
+                            )
+                        ]
+                    })
+                } catch (error) {
+                    console.error(error)
+                }
+
+                break
+            case "administration/lookup/transfer":
+                const transferUsername = interaction.message.embeds[0].title.split(" ")[2]
+                const transferModal = new ModalBuilder()
+                    .setTitle(`Transfer ${transferUsername}`)
+                    .setCustomId("administration/lookup/transfer")
+                    .addComponents(
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new TextInputBuilder()
+                                    .setLabel("Why are you transferring their inventory?")
+                                    .setPlaceholder("Reason")
+                                    .setCustomId("reason")
+                                    .setRequired(true)
+                                    .setStyle(TextInputStyle.Short)
+                            ),
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new TextInputBuilder()
+                                    .setLabel("Target Username")
+                                    .setPlaceholder("Username")
+                                    .setCustomId("target")
+                                    .setRequired(true)
+                                    .setStyle(TextInputStyle.Short)
+                            ),
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new TextInputBuilder()
+                                    .setLabel("Percent to Transfer")
+                                    .setPlaceholder("0-100")
+                                    .setCustomId("percent")
+                                    .setRequired(true)
+                                    .setStyle(TextInputStyle.Short)
+                            ),
+                    )
+
+                interaction.showModal(transferModal);
                 break;
         }
     },
@@ -481,10 +558,15 @@ module.exports = {
                     const action_row = new ActionRowBuilder()
                     const components = [
                         new ButtonBuilder()
-                            .setCustomId("administration/lookup/unban")
-                            .setLabel("Unban")
-                            .setEmoji("<:unban:1252630527731564666>")
-                            .setStyle(ButtonStyle.Success),
+                            .setCustomId("administration/lookup/gameban")
+                            .setLabel("Ban")
+                            .setEmoji("<:banicon:1252425649923293204>")
+                            .setStyle(ButtonStyle.Danger),
+                        new ButtonBuilder()
+                            .setCustomId("administration/lookup/transfer")
+                            .setLabel("Transfer")
+                            .setEmoji("<:wipe:1255634882453831680>")
+                            .setStyle(ButtonStyle.Danger),
                         new ButtonBuilder()
                             .setCustomId("administration/lookup/edit")
                             .setLabel("Edit Cash")
@@ -494,12 +576,18 @@ module.exports = {
                             .setCustomId("administration/lookup/history")
                             .setLabel("View History")
                             .setEmoji("<:recentbets:1252425177975881728>")
+                            .setStyle(ButtonStyle.Secondary),
+                        new ButtonBuilder()
+                            .setCustomId("administration/lookup/getraw")
+                            .setLabel("Download")
+                            .setEmoji("<:getraw:1255636555674943589>")
                             .setStyle(ButtonStyle.Secondary)
                     ]
 
                     const admin_roles = ["1069023487647301692", "1113868122311639050", "1180090434744229988", "1213276024020934666", "1249703065632641045"]
                     if (!interaction.member.roles.cache.some(role => admin_roles.includes(role.id))) {
                         components[1].setDisabled(true)
+                        components[2].setDisabled(true)
                     }
 
                     if (document.value === null) {
@@ -655,6 +743,11 @@ module.exports = {
                             .setEmoji("<:banicon:1252425649923293204>")
                             .setStyle(ButtonStyle.Danger),
                         new ButtonBuilder()
+                            .setCustomId("administration/lookup/transfer")
+                            .setLabel("Transfer")
+                            .setEmoji("<:wipe:1255634882453831680>")
+                            .setStyle(ButtonStyle.Danger),
+                        new ButtonBuilder()
                             .setCustomId("administration/lookup/edit")
                             .setLabel("Edit Cash")
                             .setEmoji("<:editdataicon:1252425167699837028>")
@@ -663,12 +756,18 @@ module.exports = {
                             .setCustomId("administration/lookup/history")
                             .setLabel("View History")
                             .setEmoji("<:recentbets:1252425177975881728>")
+                            .setStyle(ButtonStyle.Secondary),
+                        new ButtonBuilder()
+                            .setCustomId("administration/lookup/getraw")
+                            .setLabel("Download")
+                            .setEmoji("<:getraw:1255636555674943589>")
                             .setStyle(ButtonStyle.Secondary)
                     ]
 
                     const admin_roles = ["1069023487647301692", "1113868122311639050", "1180090434744229988", "1213276024020934666", "1249703065632641045"]
                     if (!interaction.member.roles.cache.some(role => admin_roles.includes(role.id))) {
                         components[1].setDisabled(true)
+                        components[2].setDisabled(true)
                     }
 
                     if (document.value === null) {
@@ -724,6 +823,168 @@ module.exports = {
                     console.error(error)
                     return embeds.errorEmbed(interaction, "Something went wrong, please try again later.")
                 })
+
+            case "administration/lookup/transfer":
+                const transfer_reason = interaction.fields.getTextInputValue("reason") || "No reason provided";
+                const transfer_target = interaction.fields.getTextInputValue("target");
+                const transfer_percent = Number(interaction.fields.getTextInputValue("percent"));
+                const target_id = await getIdFromUsername(transfer_target)
+
+                if (!target_id) {
+                    return embeds.errorEmbed(interaction, "Target user not found.")
+                }
+
+                if (isNaN(transfer_percent)) {
+                    return embeds.errorEmbed(interaction, "Please provide a valid percentage from 0-100.")
+                }
+
+                if (transfer_percent < 0 || transfer_percent > 100) {
+                    return embeds.errorEmbed(interaction, "Please provide a valid percentage from 0-100.")
+                }
+
+                const database = await databaseService.getDatabase("ArcadeHaven")
+                const items_collection = database.collection("items")
+
+                const docs = await items_collection
+                    .find(
+                        { "serials.u": Number(document.UserId) },
+                        {
+                            projection: {
+                                "serials.u": 1,
+                                "serials._id": 1,
+                                itemId: 1,
+                                value: 1,
+                                rap: 1,
+                            },
+                        }
+                    )
+                    .toArray();
+
+                    console.log(docs)
+
+                let new_inventory = {};
+                let total_item_value = 0;
+                docs.forEach(function (item) {
+                    const serials = item.serials;
+                    serials.forEach(function (serial_info, serial) {
+                        if (!serial_info) return;
+                        const owner_id = serial_info.u;
+                        if (owner_id === Number(document.UserId)) {
+                            if (!new_inventory[String(item.itemId)]) {
+                                new_inventory[String(item.itemId)] = [];
+                            }
+
+                            total_item_value += item.value || item.rap;
+                            new_inventory[String(item.itemId)].push(String(serial + 1));
+                        }
+                    });
+                });
+
+                let items_to_transfer = []
+                let total_value = 0
+                const target_value = Math.floor(total_item_value * (transfer_percent / 100))
+                const max_allowed_value = target_value * 1.1 // 10% buffer
+
+                if (transfer_percent !== 100) {
+                    while (total_value < target_value) {
+                        const randomItem = Object.keys(new_inventory)[
+                            Math.floor(Math.random() * Object.keys(new_inventory).length)
+                        ];
+                        const randomSerial = new_inventory[randomItem][
+                            Math.floor(Math.random() * new_inventory[randomItem].length)
+                        ];
+                        const item = docs.find((item) => item.itemId === parseInt(randomItem));
+
+                        if (!item) continue;
+
+                        const potentialValue = total_value + (item.value || item.rap || 0);
+                        if (potentialValue > max_allowed_value) continue;
+
+                        items_to_transfer.push(`${randomItem}-${randomSerial}`);
+                        total_value = potentialValue;
+                    }
+                } else {
+                    items_to_transfer = Object.keys(new_inventory).map((itemId) => {
+                        return new_inventory[itemId].map((serial) => `${itemId}-${serial}`);
+                    });
+                    items_to_transfer = items_to_transfer.flat();
+                    total_value = total_item_value;
+                }
+
+                let update_promises = items_to_transfer.map((item) => {
+                    const [itemId, serial] = item.split("-");
+                    if (!itemId || !serial) {
+                        return Promise.reject(new Error("Invalid item format"));
+                    }
+                    return items_collection.updateOne(
+                        { itemId: parseInt(itemId) },
+                        {
+                            $set: {
+                                [`serials.${parseInt(serial) - 1}.u`]: target_id,
+                                [`serials.${parseInt(serial) - 1}.t`]: Math.floor(Date.now() / 1000),
+                            },
+                        }
+                    );
+                });
+
+                console.log(items_to_transfer)
+
+                Promise.all(update_promises)
+                    .then(() => {
+                        embeds.successEmbed(interaction, `Successfully transferred items to ${transfer_target}.`, null, true)
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                        return embeds.errorEmbed(interaction, "Something went wrong, please try again later.", null, true)
+                    });
+
+                const case_id = await createCase({
+                    type: "Transfer",
+                    target: document.UserId,
+                    receiver: target_id,
+                    reason: transfer_reason,
+                    moderator: interaction.user.id,
+                    timestamp: Date.now(),
+                })
+
+                logAction(client, {
+                    embeds: [
+                        new EmbedBuilder()
+                            .addFields(
+                                {
+                                    name: "Case",
+                                    value: `\`${case_id}\``,
+                                    inline: true
+                                },
+                                {
+                                    name: "Type",
+                                    value: "`Transfer`",
+                                    inline: true
+                                },
+                                {
+                                    name: "Moderator",
+                                    value: `\`${interaction.user.username}\``,
+                                    inline: true
+                                },
+                                {
+                                    name: "Target",
+                                    value: `<:singleright:1252703372998611085> [\`@${interaction.message.embeds[0].title.split(" ")[2]}\`](https://www.roblox.com/users/${document.UserId}/profile)`,
+                                },
+                                {
+                                    name: "Receiver",
+                                    value: `<:singleright:1252703372998611085> [\`@${transfer_target}\`](https://www.roblox.com/users/${target_id}/profile)`,
+                                },
+                                {
+                                    name: "Reason",
+                                    value: transfer_reason
+                                }
+                            )
+                            .setTimestamp(new Date())
+                            .setThumbnail(interaction.message.embeds[0].thumbnail.url)
+                            .setColor("Blue")
+                    ]
+                }, case_id)
+
                 break
             default:
                 break

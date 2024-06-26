@@ -11,7 +11,9 @@ module.exports = {
     "administration/lookup/history/previous-far",
     "administration/lookup/history/next-far",
     "administration/lookup/history/close",
-    "administration/lookup/unban"
+    "administration/lookup/unban",
+    "administration/lookup/getraw",
+    "administration/lookup/transfer",
   ],
   async execute(interaction, client) {
     if (interaction.user.id !== interaction.message.interaction.user.id)
