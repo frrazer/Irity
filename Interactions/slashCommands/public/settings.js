@@ -21,6 +21,28 @@ const settings = {
                 .setRequired(true))
 }
 
+async function createDocument(collection, authorId) {
+    const document = {
+        user_id: authorId,
+        tracking: {
+            messages: 1,
+            xp: 0,
+            last_message: Date.now(),
+        },
+        settings: {
+            level_up_notification: true,
+            sale_notifications: false,
+        },
+        caching: {
+            last_updated: Date.now(),
+            username: message.author.username,
+        }
+    };
+
+    await collection.insertOne(document);
+    return document;
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("settings")
@@ -29,12 +51,16 @@ module.exports = {
     async execute(interaction, client) {
         const subcommand = interaction.options.getSubcommand();
 
+        let document = await collection.findOne({ user_id: authorId });
+        if (!document) {
+            document = await createDocument(collection, authorId);
+        }
+
         if (subcommand === "level_up_notification") {
             const value = interaction.options.getBoolean("value");
             const database = await databaseService.getDatabase("DiscordServer");
             const collection = database.collection("CasinoEmpireLevelling");
             const authorId = interaction.user.id;
-
             const result = await collection.updateOne({ user_id: authorId }, {
                 $set: {
                     "settings.level_up_notification": value,
