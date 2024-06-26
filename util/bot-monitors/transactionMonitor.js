@@ -76,6 +76,7 @@ async function handleTipsChannel(message) {
         type: "tip"
     };
 
+    handleUserNotification(transaction);
     await saveTransaction(transaction);
 }
 
