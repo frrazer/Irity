@@ -1,5 +1,7 @@
 const databaseService = require("../../services/databaseService");
 const crypto = require('crypto');
+const { EmbedBuilder } = require("discord.js");
+const { getDiscordFromRoblox } = require("../getDiscordFromRoblox");
 
 async function transactionMonitor(message) {
     const allowed_channels = ["1112734635210846310", "1142738352731332689"];
@@ -53,6 +55,26 @@ async function handleRAPChangesChannel(message) {
         transaction_id,
         type: "marketplace"
     };
+
+    buyer_discord_id = await getDiscordFromRoblox(client, buyer_id);
+    const user_database = await databaseService.getDatabase("DiscordServer");
+    const user_collection = user_database.collection("CasinoEmpireLevelling");
+    const seller = await user_collection.findOne({ user_id: buyer_discord_id });
+
+    if (seller) {
+        if (seller.settings.sale_notifications) {
+            const seller_user = await client.users.fetch(seller_id);
+            const seller_dm = await seller_user.createDM();
+            const embed = new EmbedBuilder()
+                .setTitle("Item Sold")
+                .setDescription(`Your item **${item_name}** was sold for **$${sale_price.toLocaleString()}**.`)
+                .setColor("Green")
+                .setFooter({ text: `Transaction ID: ${transaction_id}` });
+
+            await seller_dm.send({ embeds: [embed] });
+        }
+    }
+
 
     await saveTransaction(transaction);
 }
