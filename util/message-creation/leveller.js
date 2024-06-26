@@ -33,7 +33,7 @@ async function level(message, client) {
                 settings: {
                     level_up_notification: true,
                 },
-                cacheing: {
+                caching: {
                     last_updated: Date.now(),
                     username: message.author.username,
                 }
@@ -61,8 +61,8 @@ async function level(message, client) {
                 "tracking.messages": newMessages,
                 "tracking.xp": newXp,
                 "tracking.last_message": Date.now(),
-                "cacheing.last_updated": Date.now(),
-                "cacheing.username": message.author.username,
+                "caching.last_updated": Date.now(),
+                "caching.username": message.author.username,
             }
         });
 
