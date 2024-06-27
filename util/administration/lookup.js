@@ -67,14 +67,7 @@ module.exports = {
         if (!user_id) return embeds.errorEmbed(interaction, "User not found.")
 
         let reference = options ? interaction.id : interaction.message.interaction.id
-        let ban_status
         let thumbnail
-
-        try {
-            ban_status = await robloxService.getBanStatus(`MAIN_${user_id}`)
-        } catch (error) {
-            ban_status = "error"
-        }
 
         try {
             thumbnail = (await getPlayerThumbnail(user_id, "180x180", "png", false, "headshot"))[0].imageUrl
@@ -83,7 +76,13 @@ module.exports = {
         }
 
         robloxService.getDatastoreEntry(`MAIN_${user_id}`, reference).then(async (data) => {
-            console.log(`Fetched entry for key MAIN_${user_id} from Datastore`, data)
+            let ban_status
+
+            try {
+                ban_status = await robloxService.getBanStatus(`MAIN_${user_id}`)
+            } catch (error) {
+                ban_status = "error"
+            }
 
             const user_data = data.data.Data
             const meta_data = data.data.MetaData
@@ -185,6 +184,7 @@ module.exports = {
                 components[2].setDisabled(true)
             }
 
+            console.log(components)
             action_row.addComponents(...components)
 
             if (!options) {
@@ -192,7 +192,15 @@ module.exports = {
             } else {
                 await interaction.editReply({ embeds: [embed], components: [action_row] })
             }
-        }).catch((error) => {
+        }).catch(async (error) => {
+            let ban_status
+
+            try {
+                ban_status = await robloxService.getBanStatus(`MAIN_${user_id}`)
+            } catch (error) {
+                ban_status = "error"
+            }
+
             if (error.message === "404 NOT_FOUND Entry not found in the datastore.") {
                 const embed = new EmbedBuilder()
                     .setTitle(`Lookup for ${username}`)
@@ -239,6 +247,7 @@ module.exports = {
                     })
                 }
 
+                console.log(components)
                 action_row.addComponents(...components)
                 return interaction.editReply({ embeds: [embed], components: [action_row] })
             }
@@ -461,6 +470,7 @@ module.exports = {
                     )
 
                 interaction.showModal(unbanModal);
+                break;
             case "administration/lookup/getraw":
                 try {
                     await interaction.deferReply()
@@ -558,10 +568,10 @@ module.exports = {
                     const action_row = new ActionRowBuilder()
                     const components = [
                         new ButtonBuilder()
-                            .setCustomId("administration/lookup/gameban")
-                            .setLabel("Ban")
-                            .setEmoji("<:banicon:1252425649923293204>")
-                            .setStyle(ButtonStyle.Danger),
+                            .setCustomId("administration/lookup/unban")
+                            .setLabel("Unban")
+                            .setEmoji("<:unban:1252630527731564666>")
+                            .setStyle(ButtonStyle.Success),
                         new ButtonBuilder()
                             .setCustomId("administration/lookup/transfer")
                             .setLabel("Transfer")
@@ -823,7 +833,7 @@ module.exports = {
                     console.error(error)
                     return embeds.errorEmbed(interaction, "Something went wrong, please try again later.")
                 })
-
+                break
             case "administration/lookup/transfer":
                 const transfer_reason = interaction.fields.getTextInputValue("reason") || "No reason provided";
                 const transfer_target = interaction.fields.getTextInputValue("target");
@@ -860,7 +870,7 @@ module.exports = {
                     )
                     .toArray();
 
-                    console.log(docs)
+                console.log(docs)
 
                 let new_inventory = {};
                 let total_item_value = 0;
