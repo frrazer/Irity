@@ -33,10 +33,14 @@ module.exports = {
     });
 
     usageMonitor(client);
-    addCashMonitor(client);
-    robuxMarketMonitor(client);
-    activeCodeMonitor(client);
-    autodropMonitor(client);
-    messageServer(client);
+
+    const isDevMode = process.argv.includes('dev');
+    if (!isDevMode) {
+      addCashMonitor(client);
+      robuxMarketMonitor(client);
+      activeCodeMonitor(client);
+      autodropMonitor(client);
+      messageServer(client);
+    }
   },
 };

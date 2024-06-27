@@ -57,7 +57,7 @@ module.exports = {
         .addSubcommand(settings.lookup)
         .addSubcommand(settings.case)
         .addSubcommand(settings.settings)
-        .addSubcommand(settings.upload),
+        .addSubcommand(settings.upload),        
     roles: ["1182048570216546395"],
     async execute(interaction, client) {
         const subcommand = interaction.options.getSubcommand();
