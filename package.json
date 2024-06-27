@@ -16,6 +16,7 @@
     "@vimeo/player": "^2.23.0",
     "axios": "^1.7.2",
     "chalk": "^5.3.0",
+    "chartjs-node-canvas": "^4.1.6",
     "dayjs": "^1.11.11",
     "discord.js": "^14.14.1",
     "distube": "^5.0.1",

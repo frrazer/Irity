@@ -4,6 +4,21 @@ const { stringToDuration } = require("../util/functions")
 const { EmbedBuilder } = require("@discordjs/builders")
 const axios = require("axios")
 
+async function checkAndMigrateLegacyBan(key, entry) {
+    try {
+        const unban_time = entry.data.Data.Moderation.BanData2.EpochTime;
+        const remaining_time = Math.floor((unban_time - Date.now() / 1000));
+
+        console.log(unban_time, remaining_time);
+
+        entry.data.Data.Moderation.BanData2.Banned = false
+        await module.exports.setDatastoreEntry(key, entry.data)
+        await module.exports.gameBan(key, 0, `${remaining_time}s`, true, "Irity")
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 module.exports = {
     async getDatastoreEntry(key, reference) {
         const database = await databaseService.getDatabase("DiscordServer")
@@ -32,9 +47,10 @@ module.exports = {
 
         try {
             entry = await getDatastoreEntry(4570608156, process.env.DATASTORE_NAME, key)
-            console.log(`Fetched entry for key ${key} from Datastore`)
 
             if (entry) {
+                await checkAndMigrateLegacyBan(key, entry)
+
                 let doc = {
                     key,
                     value: entry,
@@ -74,6 +90,7 @@ module.exports = {
     },
 
     async gameBan(key, rule_violation, duration, ban_alts, admin) {
+        console.log(duration)
         let true_duration
         if (duration === "perm") {
             true_duration = 60 * 60 * 24 * 365 * 2 // 2 years
@@ -89,7 +106,9 @@ module.exports = {
                 active: true,
                 duration: `${true_duration}s`,
                 privateReason: "Check Irity cases for more information",
-                displayReason: `We believe you have violated rule ${rule_violation}. You can appeal this ban by joining our Discord server.`,
+                displayReason:
+                    rule_violation !== 0 ? `We believe you have violated rule ${rule_violation}. You can appeal this ban by joining our Discord server.`
+                        : `We believe you have violated one of our rules. You can appeal this ban by joining our Discord server.`,
                 excludeAltAccounts: !ban_alts,
                 inherited: true,
                 startTime: new Date().toISOString()
