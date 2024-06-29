@@ -112,8 +112,6 @@ async function execute(message, client) {
     }
 
     const item_info = details[item_id];
-    const projected = (item_info[19] !== null)
-    const value = item_info[16] || (!projected ? item_info[8] : 0)
 
     const doc = {
         item_id: Number(item_id),
@@ -121,7 +119,6 @@ async function execute(message, client) {
         price: Number(price),
         [is_duration ? "date" : "quantity"]: is_duration ? quantity : Number(quantity),
         user: message.author.id,
-        value: roundToNearestSignificant(value),
     }
 
     auto_dropper.insertOne(doc);
