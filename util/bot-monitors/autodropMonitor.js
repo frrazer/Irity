@@ -51,7 +51,7 @@ module.exports = async function (client) {
             })
 
             try {
-                const drop_result = await dropItem(client, doc.item_id, doc)
+                const drop_result = await dropItem(client, doc.item_id, doc, 2)
                 await log_message.edit({
                     embeds: [await embeds.successEmbed(null, `Dropped **${drop_result.name}**! Next drop in <t:${Math.floor(next.getTime() / 1000)}:R>`, null, false, true)]
                 })
