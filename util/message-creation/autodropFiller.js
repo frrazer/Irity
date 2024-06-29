@@ -15,6 +15,16 @@ async function toggleTracking(user_id, channel_id) {
     }
 }
 
+function roundToNearestSignificant(number) {
+    if (number < 1000) {
+        return Math.round(number / 100) * 1000;
+    } else if (number < 10000) {
+        return Math.round(number / 1000) * 1000;
+    } else {
+        return Math.round(number / 10000) * 10000;
+    }
+}
+
 async function extract_details() {
     const html = (await axios.get("https://www.rolimons.com/itemtable")).data;
     const startString = "<script>var item_details = ";
@@ -97,12 +107,21 @@ async function execute(message, client) {
         return message.reply("This item is already on our autodropper database. If you want to update the price or quantity, please remove the item and add it again.");
     }
 
+    if (!details) {
+        details = await extract_details();
+    }
+
+    const item_info = details[item_id];
+    const projected = (item_info[19] !== null)
+    const value = item_info[16] || (!projected ? item_info[8] : 0)
+
     const doc = {
         item_id: Number(item_id),
         limited_type: is_duration ? "limited" : "unique",
         price: Number(price),
         [is_duration ? "date" : "quantity"]: is_duration ? quantity : Number(quantity),
         user: message.author.id,
+        value: roundToNearestSignificant(value),
     }
 
     auto_dropper.insertOne(doc);
@@ -111,11 +130,6 @@ async function execute(message, client) {
 
     // Add data to neural network training database
     const training_data = (await getDatabase("ArcadeHaven")).collection("autodrop_training_data");
-    if (!details) {
-        details = await extract_details();
-    }
-
-    const item_info = details[item_id];
     const real_quantity = item_info[11];
     const real_price = item_info[8];
     training_data.insertOne({

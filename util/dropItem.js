@@ -5,7 +5,7 @@ const { getDatabase } = require("../services/databaseService");
 const { EmbedBuilder } = require("discord.js");
 const { default: axios } = require("axios");
 
-module.exports = async function (client, item_id, data) {
+module.exports = async function (client, item_id, data, reserve) {
     try {
         const database = await getDatabase("ArcadeHaven");
         const items = database.collection("items");
@@ -25,12 +25,23 @@ module.exports = async function (client, item_id, data) {
             originalPrice: Number(data.price),
             releaseTime: Math.floor(new Date().getTime() / 1000),
             rap: 0,
-            quantitySold: 0,
+            quantitySold: reserve || 0,
             history: { sales: [], rap: [] },
             serials: [],
             reselling: {},
-            tradeable: false
+            tradeable: false,
+            value: data.value || 0
         };
+
+        if (reserve && reserve > 0) {
+            const timestamp = Math.floor(Date.now() / 1000);
+            for (let i = 0; i < reserve; i++) {
+                item_data.serials.push({
+                    u: 1,
+                    t: timestamp,
+                });
+            }
+        }
 
         if (data.limited_type === "unique") {
             item_data.totalQuantity = data.quantity;
@@ -68,6 +79,11 @@ async function postDropEmbed(client, doc, user_id) {
         ...(doc.type === "limited" ? [{
             name: "Offsale Time",
             value: `<t:${doc.offsaleTime}:R>`,
+            inline: true
+        }] : []),
+        ...(doc.value !== 0 ? [{
+            name: "Value",
+            value: doc.value.toLocaleString(),
             inline: true
         }] : [])
     ];
