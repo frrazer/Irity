@@ -59,7 +59,11 @@ function isOnCooldown(message, command, client) {
   return cooldown(message, command, message.author.id, client);
 }
 
+const WHITELISTED_GUILDS = ["932320416989610065"]
+
 async function handleRegularMessage(message, client) {
+  if (!WHITELISTED_GUILDS.includes(message.guild.id)) return;
+
   checkForLinks(message);
   level(message, client);
   autodropFiller.execute(message, client);

@@ -91,6 +91,7 @@ async function saveTransaction(transaction) {
 
 async function handleUserNotification(message, transaction, item_name) {
     const client = require("../../bot").client
+    if (message.embeds.length === 0) return;
 
     try {
         const [_, seller_discord_id] = await getDiscordFromRoblox(transaction.seller_id);

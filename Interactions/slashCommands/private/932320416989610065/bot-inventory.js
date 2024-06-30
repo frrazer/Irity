@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
-const databaseService = require("../../../services/databaseService");
-const embeds = require("../../../util/embed")
-const { findItems, findItem } = require("../../../util/searchMarketplace");
+const databaseService = require("../../../../services/databaseService");
+const embeds = require("../../../../util/embed")
+const { findItems, findItem } = require("../../../../util/searchMarketplace");
 const { getThumbnails } = require("noblox.js");
 
 const settings = {

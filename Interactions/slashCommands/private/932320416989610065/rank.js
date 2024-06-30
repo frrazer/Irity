@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
-const databaseService = require("../../../services/databaseService");
-const embeds = require("../../../util/embed")
-const calculateLevel = require("../../../util/calculateLevel");
+const databaseService = require("../../../../services/databaseService");
+const embeds = require("../../../../util/embed")
+const calculateLevel = require("../../../../util/calculateLevel");
 
 module.exports = {
     data: new SlashCommandBuilder()
