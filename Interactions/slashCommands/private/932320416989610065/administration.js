@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
-const databaseService = require("../../../services/databaseService");
-const embeds = require("../../../util/embed")
+const databaseService = require("../../../../services/databaseService");
+const embeds = require("../../../../util/embed")
 
 const settings = {
     "lookup": new SlashCommandSubcommandBuilder()
@@ -63,7 +63,7 @@ module.exports = {
         const subcommand = interaction.options.getSubcommand();
 
         try {
-            require(`../../../util/administration/${subcommand}.js`).execute(interaction, client)
+            require(`../../../../util/administration/${subcommand}.js`).execute(interaction, client)
         } catch (error) {
             console.error(error);
             return embeds.errorEmbed(interaction, "This command is not implemented yet.")

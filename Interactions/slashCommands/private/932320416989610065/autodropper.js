@@ -1,7 +1,7 @@
 const { SlashCommandSubcommandBuilder, SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const embeds = require("../../../util/embed")
-const autodropper = require("../../../util/message-creation/autodropFiller")
-const databaseService = require("../../../services/databaseService")
+const embeds = require("../../../../util/embed")
+const autodropper = require("../../../../util/message-creation/autodropFiller")
+const databaseService = require("../../../../services/databaseService")
 
 const settings = {
     "monitor": new SlashCommandSubcommandBuilder()

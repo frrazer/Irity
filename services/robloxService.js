@@ -107,7 +107,7 @@ module.exports = {
                 duration: `${true_duration}s`,
                 privateReason: "Check Irity cases for more information",
                 displayReason:
-                    rule_violation !== 0 ? `We believe you have violated rule ${rule_violation}. You can appeal this ban by joining our Discord server.`
+                    rule_violation !== "0" ? `We believe you have violated rule ${rule_violation}. You can appeal this ban by joining our Discord server.`
                         : `We believe you have violated one of our rules. You can appeal this ban by joining our Discord server.`,
                 excludeAltAccounts: !ban_alts,
                 inherited: true,
