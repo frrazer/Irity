@@ -870,8 +870,6 @@ module.exports = {
                     )
                     .toArray();
 
-                console.log(docs)
-
                 let new_inventory = {};
                 let total_item_value = 0;
                 docs.forEach(function (item) {
