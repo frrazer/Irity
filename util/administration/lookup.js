@@ -316,11 +316,6 @@ module.exports = {
                     .setCustomId("administration/lookup/history/close")
                     .setEmoji("<:close:1252438815189241897>")
                     .setStyle(ButtonStyle.Danger),
-                new ButtonBuilder()
-                    .setCustomId("administration/lookup/getraw")
-                    .setLabel("Download")
-                    .setEmoji("<:getraw:1255636555674943589>")
-                    .setStyle(ButtonStyle.Secondary)
             ];
 
             const actionRow = new ActionRowBuilder().addComponents(...components);

@@ -5,8 +5,11 @@ module.exports = async function (client) {
     const collection = db.collection("codes");
 
     const guild = await client.guilds.fetch("932320416989610065")
+    if (!guild) return;
     const channel = await guild.channels.fetch("1089320905395667045")
+    if (!channel) return;
     const message = await channel.messages.fetch("1253844862797742260")
+    if (!message) return;
 
     if (message.author.id !== client.user.id) return;
 
