@@ -12,6 +12,8 @@ module.exports = async function (client) {
             if (logs.length === 0) return;
 
             const channel = await client.channels.cache.get("1251294803518291998");
+            if (!channel) return;
+
             let message = ""
             let value = 0
 

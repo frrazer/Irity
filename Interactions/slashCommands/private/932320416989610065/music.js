@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
-const databaseService = require("../../../services/databaseService");
-const embeds = require("../../../util/embed")
+const databaseService = require("../../../../services/databaseService");
+const embeds = require("../../../../util/embed")
 
 const settings = {
     "play": new SlashCommandSubcommandBuilder()
@@ -98,7 +98,7 @@ module.exports = {
     async execute(interaction, client) {
         try {
             const subcommand = interaction.options.getSubcommand();
-            const file = require(`../../../util/music-system/${subcommand}.js`);
+            const file = require(`../../../../util/music-system/${subcommand}.js`);
             file.execute(interaction, client);
         } catch (error) {
             embeds.errorEmbed(interaction, "This command is not available yet.");

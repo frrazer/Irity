@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
-const databaseService = require("../../../services/databaseService");
-const embeds = require("../../../util/embed")
+const databaseService = require("../../../../services/databaseService");
+const embeds = require("../../../../util/embed")
 
 const settings = {
     "level_up_notification": new SlashCommandSubcommandBuilder()
