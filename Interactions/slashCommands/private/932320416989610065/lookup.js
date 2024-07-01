@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, SlashCommandSubcommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, Colors, AttachmentBuilder } = require("discord.js");
-const databaseService = require("../../../services/databaseService");
-const embeds = require("../../../util/embed")
-const generateGraph = require("../../../util/generateGraph");
+const databaseService = require("../../../../services/databaseService");
+const embeds = require("../../../../util/embed")
+const generateGraph = require("../../../../util/generateGraph");
 const { getProductInfo, getThumbnails } = require("noblox.js")
 const sharp = require("sharp")
 const { readPsd, writePsd } = require("ag-psd")
