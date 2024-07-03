@@ -90,7 +90,6 @@ module.exports = {
     },
 
     async gameBan(key, rule_violation, duration, ban_alts, admin) {
-        console.log(duration)
         let true_duration
         if (duration === "perm") {
             true_duration = 60 * 60 * 24 * 365 * 2 // 2 years
