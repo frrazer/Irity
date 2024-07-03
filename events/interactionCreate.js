@@ -4,6 +4,10 @@ module.exports = {
   name: "interactionCreate",
   once: false,
   async execute(interaction, client) {
+    console.log(
+      `${interaction.user.tag} in #${interaction.channel.name} triggered an interaction.`
+    );
+
     const isDevMode = process.argv.includes('dev');
     const developerIds = ["406163086978842625", "733707800345051216"]
     if (isDevMode && !developerIds.includes(interaction.user.id)) return;
