@@ -5,7 +5,7 @@ const { getDatabase } = require("../services/databaseService");
 const { EmbedBuilder } = require("discord.js");
 const { default: axios } = require("axios");
 
-module.exports = async function (client, item_id, data, reserve) {
+module.exports = async function (client, item_id, data, reserve, meta_data) {
     try {
         const database = await getDatabase("ArcadeHaven");
         const items = database.collection("items");
@@ -15,7 +15,7 @@ module.exports = async function (client, item_id, data, reserve) {
             return await module.exports(client, item_id, data);
         }
 
-        const product_info = await getProductInfo(item_id);
+        const product_info = meta_data || await getProductInfo(item_id);
         let item_data = {
             itemId: Number(item_id),
             name: product_info.Name,
@@ -52,7 +52,7 @@ module.exports = async function (client, item_id, data, reserve) {
 
         await items.insertOne(item_data);
         await postToRoblox(item_id);
-        await postDropEmbed(client, item_data, data.user || "1185559942917263390");
+        await postDropEmbed(client, item_data, data.user || "1185559942917263390", data.Image);
 
         return item_data
     } catch (error) {
@@ -60,7 +60,7 @@ module.exports = async function (client, item_id, data, reserve) {
     }
 }
 
-async function postDropEmbed(client, doc, user_id) {
+async function postDropEmbed(client, doc, user_id, image_url) {
     const guild = client.guilds.cache.get("932320416989610065");
     const channel = guild.channels.cache.get("1157724862123606038");
     const member = await guild.members.fetch(user_id);
@@ -89,7 +89,7 @@ async function postDropEmbed(client, doc, user_id) {
     ];
 
     const member_avatar = await member.user.displayAvatarURL({ size: 256 });
-    let item_icon = (await getThumbnails([
+    let item_icon = image_url || (await getThumbnails([
         {
             type: "Asset",
             size: "150x150",

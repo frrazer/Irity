@@ -1,4 +1,4 @@
-const embeds = require("../../util/embed")
+const embeds = require("../../util/embed");
 
 module.exports = {
   name: "administration/lookup",
@@ -17,8 +17,16 @@ module.exports = {
   ],
   async execute(interaction, client) {
     if (interaction.user.id !== interaction.message.interaction.user.id)
-      return embeds.errorEmbed(interaction, "You cannot use this button.", null, true);
+      return embeds.errorEmbed(
+        interaction,
+        "You cannot use this button.",
+        null,
+        true
+      );
 
-    return require("../../util/administration/lookup").button(interaction, client);
+    return require("../../util/administration/lookup").button(
+      interaction,
+      client
+    );
   },
 };
