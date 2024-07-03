@@ -30,12 +30,12 @@ module.exports = async function (client) {
                 }
             }
 
-            let content = `## <:tt_ys:1187754951171125249> Active Codes\n\n`
+            let content = `## <:tt_ys:1187754951171125249> Active Codes\n\n`;
             for (let code of active_codes) {
                 if (code.expiration) {
-                    content += `**${code.code}** - Expires <t:${Math.floor(code.expiration / 1000)}:R>\n`
+                    content += `**${code.code}** - Expires <t:${Math.floor(code.expiration / 1000)}:R>\n`;
                 } else if (code.max_uses) {
-                    content += `**${code.code}** - ${code.uses || 0}/${code.max_uses} uses\n`
+                    content += `**${code.code}** - ${code.uses || 0}/${code.max_uses} uses\n`;
                 }
             }
 
@@ -43,7 +43,9 @@ module.exports = async function (client) {
                 return str.trim().replace(/\s+/g, ' ');
             }
 
-            if (normalizeString(message.content) !== normalizeString(content)) {
+            const normalizedMessageContent = normalizeString(message.content);
+            const normalizedContent = normalizeString(content);
+            if (normalizedMessageContent !== normalizedContent) {
                 message.edit(content);
             }
         } catch (error) {
