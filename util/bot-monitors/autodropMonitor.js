@@ -56,19 +56,18 @@ module.exports = async function (client) {
                     embeds: [await embeds.successEmbed(null, `Dropped **${drop_result.name}**! Next drop in <t:${Math.floor(next.getTime() / 1000)}:R>`, null, false, true)]
                 })
             } catch (error) {
-                await log_message.edit({
-                    embeds: [await embeds.errorEmbed(null, `Failed to drop item: ${error}. Next drop in <t:${Math.floor(next.getTime() / 1000)}:R>`, null, false, true)]
-                })
+                const next = new Date(now.getTime() + 120000)
+                await collection.updateOne({ next_autodrop: { $exists: true } }, { $set: { next_autodrop: next } })
+                await auto_dropper.updateOne({ _id: doc._id }, { $set: { dropped: false } })
 
-                log_message.reply({
-                    content: `<@406163086978842625>`
+                await log_message.edit({
+                    embeds: [await embeds.errorEmbed(null, `Failed to drop item:\n\n\`\`\`${error}\n\`\`\`\nRetrying <t:${Math.floor(next.getTime() / 1000)}:R>`, null, false, true)]
                 })
             }
 
 
         }
     }
-
 
     autodrop()
     setInterval(autodrop, 5000);
