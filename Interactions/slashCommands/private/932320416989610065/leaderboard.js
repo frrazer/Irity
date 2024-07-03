@@ -34,7 +34,7 @@ module.exports = {
             for (let i = 0; i < leaderboard.length; i++) {
                 let username;
                 const now = Date.now();
-                const oneHour = 60 * 60 * 1000; // in milliseconds
+                const oneHour = 60 * 60 * 1000;
 
                 if (leaderboard[i].caching && leaderboard[i].caching.username && leaderboard[i].caching.last_updated && now - leaderboard[i].caching.last_updated < oneHour) {
                     username = leaderboard[i].caching.username;

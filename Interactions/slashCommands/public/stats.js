@@ -1,13 +1,13 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const { convertTime } = require("../../../../util/functions");
-const { errorEmbed } = require("../../../../util/embed");
+const { convertTime } = require("../../../util/functions");
+const { errorEmbed } = require("../../../util/embed");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("stats")
     .setDescription("Shows the bot's stats."),
   async execute(interaction, client) {
-    const ping = interaction.createdTimestamp - Date.now();
+    const ping = Date.now() - interaction.createdTimestamp;
     await interaction.reply({
       embeds: [
         new EmbedBuilder()

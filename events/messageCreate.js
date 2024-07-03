@@ -17,7 +17,6 @@ module.exports = {
     if (message.content.startsWith(commandPrefix)) {
       const args = message.content.slice(commandPrefix.length).trim().split(/ +/);
       const commandName = args.shift().toLowerCase();
-
       const command = findCommand(client, commandName);
       if (!command) return;
 
