@@ -17,7 +17,7 @@ module.exports = async function (data, title, dimensions, colour) {
                     fill: false,
                     borderColor: colour,
                     tension: 0.1,
-                    borderWidth: 5,
+                    borderWidth: 2,
                     pointRadius: 0,
                 },
             ],
