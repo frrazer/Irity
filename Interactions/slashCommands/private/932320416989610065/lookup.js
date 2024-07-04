@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, SlashCommandSubcommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, Colors, AttachmentBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, SlashCommandSubcommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, AttachmentBuilder } = require("discord.js");
 const databaseService = require("../../../../services/databaseService");
 const embeds = require("../../../../util/embed")
 const generateGraph = require("../../../../util/generateGraph");
