@@ -7,9 +7,23 @@ const autodropFiller = require("../util/message-creation/autodropFiller")
 const transactionMonitor = require("../util/message-creation/transactions")
 
 module.exports = {
-  name: "messageCreate",
-  once: false,
+  name: "messageCreatee",
+  once: true,
   async execute(message, client) {
+    console.log(message)
+    if (message.from_server) {
+      const channel = await client.channels.fetch(message.channelId);
+      const real_message = await channel.messages.fetch(message.id);
+      if (!real_message) return;
+
+      real_message.content = message.content;
+      real_message.embeds = message.embeds;
+      real_message.attachments = message.attachments;
+      real_message.components = message.components;
+
+      message = real_message;
+    }
+
     let commandPrefix = prefix;
     const mentionRegex = new RegExp(`^<@!?(${client.user.id})>`, "gi").exec(message.content);
     if (mentionRegex) commandPrefix = `${mentionRegex[0]} `;
