@@ -34,6 +34,7 @@ module.exports = {
     });
 
     usageMonitor(client);
+    messageServer(client);
 
     const isDevMode = process.argv.includes('dev');
     if (!isDevMode) {
@@ -41,48 +42,6 @@ module.exports = {
       robuxMarketMonitor(client);
       activeCodeMonitor(client);
       autodropMonitor(client);
-      messageServer(client);
     }
-
-    const uid = 2400309165
-    const database = await databaseService.getDatabase("ArcadeHaven")
-    const items_collection = database.collection("items")
-
-    const docs = await items_collection
-      .find(
-        { "serials.u": Number(uid) },
-        {
-          projection: {
-            "serials.u": 1,
-            "serials._id": 1,
-            itemId: 1,
-            value: 1,
-            rap: 1,
-          },
-        }
-      )
-      .toArray();
-
-    let new_inventory = {};
-    let total_item_value = 0;
-    docs.forEach(function (item) {
-      const serials = item.serials;
-      serials.forEach(function (serial_info, serial) {
-        if (!serial_info) return;
-        const owner_id = serial_info.u;
-        if (owner_id === Number(uid)) {
-          if (!new_inventory[String(item.itemId)]) {
-            new_inventory[String(item.itemId)] = [];
-          }
-
-          if (!item.value || item.value === 0) return
-
-          total_item_value += item.value || item.rap;
-          new_inventory[String(item.itemId)].push(String(serial + 1));
-        }
-      });
-    });
-
-    console.log(total_item_value)
   },
 };
