@@ -62,6 +62,8 @@ async function handleRAPChangesChannel(message) {
 }
 
 async function handleTipsChannel(message) {
+    if (message.content === null || message.content === "") return;
+
     const [tipper, tipped, rawAmount] = [...message.content.match(/https:\/\/www\.roblox\.com\/users\/\$?(\d+)\/profile/g).map(url => url.match(/\d+/)[0]), message.content.split(" ").pop()];
     const amount = parseInt(rawAmount.replace(/[$,]/g, ""), 10) || 0;
     const tip_date = new Date(message.createdTimestamp);
