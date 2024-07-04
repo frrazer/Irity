@@ -31,6 +31,9 @@ module.exports = {
                 /\[([^\[\]]+?)(\s<:verified:\d+>)?\]\(https:\/\/www\.roblox\.com\/users\/\d+\/profile\)/,
             )[1];
 
+            const clear = await checkForClearance(interaction, client);
+            if (!clear) return;
+
             if (!['Now', 'Later'].includes(method))
                 return embeds.errorEmbed(
                     interaction,
@@ -136,7 +139,7 @@ module.exports = {
                     price: Number(price),
                     [is_duration ? 'date' : 'quantity']: is_duration
                         ? quantity_or_duration
-                        : Number(quantity),
+                        : Number(quantity_or_duration),
                     user: interaction.user.id,
                 };
 
@@ -160,3 +163,112 @@ module.exports = {
         }
     },
 };
+
+async function checkForClearance(interaction, client) {
+    let ALLOWED_ROLES = ['1182048570216546395', '1139471373383782450'];
+    const member = interaction.member;
+    const bypassable = functions.validateRoles(member, [''], 'one');
+
+    if (bypassable) return true;
+    if (!functions.validateRoles(member, ALLOWED_ROLES, 'one')) {
+        embeds.errorEmbed(
+            interaction,
+            'You do not have permission to do that.',
+        );
+
+        return false;
+    }
+
+    const method = interaction.fields.getTextInputValue('method') || 'Later';
+    if (method === 'Now') {
+        if (!functions.validateRoles(member, [''], 'one')) {
+            embeds.errorEmbed(
+                interaction,
+                'You do not have permission to drop items immediately.',
+            );
+
+            return false;
+        }
+    }
+
+    let price;
+    try {
+        price = functions.calculateExpression(
+            interaction.fields.getTextInputValue('price'),
+        );
+    } catch (error) {
+        embeds.errorEmbed(interaction, 'Invalid price provided.');
+
+        return false;
+    }
+
+    if (price <= 0 || price > 1000000) {
+        embeds.errorEmbed(
+            interaction,
+            'Price must be between $0 and $1,000,000.',
+        );
+
+        return false;
+    }
+
+    const quantity_or_duration =
+        interaction.fields.getTextInputValue('quantity');
+
+    if (Number(quantity_or_duration)) {
+        if (Number(quantity_or_duration) <= 30) {
+            embeds.errorEmbed(
+                interaction,
+                'You do not have permission to drop items with a quantity of 30 or less.',
+            );
+
+            return false;
+        } else if (Number(quantity_or_duration) > 1000) {
+            embeds.errorEmbed(
+                interaction,
+                'You do not have permission to drop items with a quantity of 1,000 or more.',
+            );
+
+            return false;
+        }
+
+        if (Number(quantity_or_duration) > 70) {
+            const auto_dropper = (await getDatabase('ArcadeHaven')).collection(
+                'auto_dropper',
+            );
+            const count = await auto_dropper.countDocuments({
+                quantity: { $lte: 50 },
+                dropped: { $ne: true },
+            });
+            const total = await auto_dropper.countDocuments({
+                dropped: { $ne: true },
+            });
+            const ratio = count / total;
+
+            if (ratio > 0.07) {
+                embeds.errorEmbed(
+                    interaction,
+                    'There are too many rare items in the autodropper. Please try adding this again later.',
+                );
+
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
+    } else {
+        try {
+            functions.stringToDuration(quantity_or_duration);
+        } catch (error) {
+            embeds.errorEmbed(
+                interaction,
+                'You must provide a valid duration for the item.',
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+}
