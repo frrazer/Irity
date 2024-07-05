@@ -1,88 +1,75 @@
-const { EmbedBuilder } = require("discord.js");
-const sharp = require("sharp");
-const databaseService = require("../../services/databaseService");
-const embeds = require("../../util/embed");
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
+const crypto = require('crypto');
+const yaml = require('yaml');
+
+async function getBufferFromUrl(url) {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: url,
+            responseType: 'arraybuffer',
+        });
+        return Buffer.from(response.data, 'binary');
+    } catch (error) {
+        console.error('Error fetching the buffer from URL:', error);
+        throw error;
+    }
+}
 
 module.exports = {
     async execute(interaction, client) {
-        const url = interaction.options.getString("url");
+        const file = interaction.options.getAttachment('file');
+        const buffer = await getBufferFromUrl(file.url);
+        const upload_id = crypto.randomBytes(5).toString('hex');
+        const extension = path.extname(file.name);
+        const filePath = path.join(
+            '/var/www/irity-content/',
+            `${upload_id}${extension}`,
+        );
+        const metadataFilePath = path.join(
+            '/var/www/irity-content/metadata/',
+            `${upload_id}.yaml`,
+        );
 
-        if (!url.startsWith("http")) {
-            return embeds.errorEmbed(
-                interaction,
-                "The URL provided is not a valid URL."
-            );
-        }
+        // Metadata to save
+        const metadata = {
+            uploader: interaction.user.username, // Assuming interaction.user contains the user info
+            uploaded_at: new Date().toISOString(),
+            original_filename: file.name,
+            file_id: upload_id,
+        };
 
-        await interaction.deferReply();
-
-        try {
-            const response = await fetch(url);
-            let content_type = response.headers.get("content-type").toLowerCase();
-            const [format, type] = content_type.split("/");
-
-            if (format === "image") {
-                if (type !== "png" && type !== "jpeg" && type !== "gif" && type !== "webp") {
-                    return embeds.errorEmbed(
-                        interaction,
-                        "The image must be in PNG, JPEG, GIF or WebP format."
-                    );
-                }
-
-                const image_data = await response.arrayBuffer();
-                const image_buffer = Buffer.from(image_data);
-                const image_id = require("crypto").randomBytes(4).toString("hex");
-                const image_path = `/var/www/irity-content/images/${image_id}.${type}`;
-                require("fs").writeFileSync(image_path, image_buffer);
-
-                const database = await databaseService.getDatabase("DiscordServer");
-                const collection = database.collection("Files");
-                await collection.insertOne({
-                    id: image_id,
-                    path: image_path,
-                    uploader: interaction.user.id,
-                    date: new Date(),
+        fs.writeFile(filePath, buffer, (err) => {
+            if (err) {
+                console.error('Error writing file:', err);
+                return interaction.reply({
+                    content: 'There was an error saving the file.',
+                    ephemeral: true,
                 });
-
-                return interaction.editReply({
-                    content: `<https://cdn.noxirity.com/${image_id}>`,
-                });
-
-            } else if (format === "video") {
-                if (type !== "mkv" && type !== "avchd" && type !== "mp4" && type !== "webm") {
-                    return embeds.errorEmbed(
-                        interaction,
-                        "The video must be in MKV, AVCHD, MP4 or WebM format."
-                    );
-                }
-
-                const video_data = await response.arrayBuffer();
-                const video_buffer = Buffer.from(video_data);
-                const video_id = require("crypto").randomBytes(4).toString("hex");
-                const video_path = `/var/www/irity-content/videos/${video_id}.${type}`;
-                require("fs").writeFileSync(video_path, video_buffer);
-
-                // save the video to the database
-                const database = await databaseService.getDatabase("DiscordServer");
-                const collection = database.collection("Files");
-                await collection.insertOne({
-                    id: video_id,
-                    path: video_path,
-                    uploader: interaction.user.id,
-                    date: new Date(),
-                });
-
-                return interaction.editReply({
-                    content: `<https://cdn.noxirity.com/${video_id}>`,
-                });
-            } else {
-                return embeds.errorEmbed(
-                    interaction,
-                    "The URL provided is not a valid image or video."
-                );
             }
-        } catch (error) {
-            console.error(error);
-        }
-    }
-}
+            const yamlMetadata = yaml.stringify(metadata);
+
+            fs.writeFile(metadataFilePath, yamlMetadata, (err) => {
+                if (err) {
+                    console.error('Error writing metadata file:', err);
+                    return interaction.reply({
+                        content: 'There was an error saving the metadata.',
+                        ephemeral: true,
+                    });
+                }
+
+                console.log(
+                    'File and metadata saved successfully:',
+                    filePath,
+                    metadataFilePath,
+                );
+                interaction.reply({
+                    content: `File uploaded successfully with ID: ${upload_id}`,
+                    ephemeral: true,
+                });
+            });
+        });
+    },
+};
