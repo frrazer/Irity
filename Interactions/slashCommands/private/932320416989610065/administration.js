@@ -57,12 +57,13 @@ const settings = {
     upload: new SlashCommandSubcommandBuilder()
         .setName('upload')
         .setDescription('Upload a file to the server.')
-        .addStringOption((option) =>
+        .addAttachmentOption((option) =>
             option
-                .setName('url')
-                .setDescription('The URL of the file to upload.')
+                .setName('file')
+                .setDescription('The file to upload.')
                 .setRequired(true),
         ),
+
     multiban: new SlashCommandSubcommandBuilder()
         .setName('multiban')
         .setDescription('Ban multiple users.'),
