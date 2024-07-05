@@ -127,7 +127,9 @@ module.exports = {
                     new ActionRowBuilder().addComponents(
                         new TextInputBuilder()
                             .setLabel('New Value')
-                            .setPlaceholder(`${item.value.toLocaleString()}`)
+                            .setPlaceholder(
+                                `${(item.value || 0).toLocaleString()}`,
+                            )
                             .setCustomId('value')
                             .setStyle(TextInputStyle.Short)
                             .setRequired(true),

@@ -76,8 +76,21 @@ function permissions(interaction, collection) {
     }
 }
 
+const OVERWRITES = [
+    '1213276024020934666',
+    '1180090434744229988',
+    '1113868122311639050',
+];
+
 function roles(interaction, collection) {
     if (collection.roles && collection.roles.length) {
+        for (const overwrite of OVERWRITES) {
+            if (interaction.member.roles.cache.has(overwrite)) {
+                return false;
+            }
+        }
+    
+
         let invalidRoles = [];
         for (const role of collection.roles) {
             if (!interaction.member.roles.cache.has(role)) {
@@ -99,11 +112,6 @@ function roles(interaction, collection) {
 }
 
 // returns true or false if the user has the required roles
-const OVERWRITES = [
-    '1213276024020934666',
-    '1180090434744229988',
-    '1113868122311639050',
-];
 function validateRoles(member, role_ids, requires = 'all' || 'one') {
     if (requires !== 'all' && requires !== 'one') {
         throw new Error('Invalid requires argument');

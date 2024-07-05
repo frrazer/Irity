@@ -28,7 +28,7 @@ module.exports = async function (client) {
     // monitorForInboundMessages(4444, client);
 };
 
-async function monitorForOutboundMessages(port = 3003) {
+async function monitorForOutboundMessages(port = 3003, client) {
     const isPortInUse = await checkPortInUse(port);
     if (isPortInUse) {
         console.error(`Port ${port} is already in use.`);
@@ -68,12 +68,18 @@ async function monitorForOutboundMessages(port = 3003) {
             await channel.send(msg);
             res.status(200).json({ status: 'success' });
         } catch (e) {
-            console.error(`Failed to send message: ${e.message}`);
             res.status(500).json({
                 status: 'error',
                 message: 'Failed to send message.',
             });
         }
+    });
+
+    app.get('/', async (req, res) => {
+        res.status(200).json({
+            status: 'success',
+            message: 'The server is running.',
+        });
     });
 
     app.listen(port, () => {

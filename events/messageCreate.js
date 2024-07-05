@@ -7,10 +7,9 @@ const autodropFiller = require("../util/message-creation/autodropFiller")
 const transactionMonitor = require("../util/message-creation/transactions")
 
 module.exports = {
-  name: "messageCreatee",
-  once: true,
+  name: "messageCreate",
+  once: false,
   async execute(message, client) {
-    console.log(message)
     if (message.from_server) {
       const channel = await client.channels.fetch(message.channelId);
       const real_message = await channel.messages.fetch(message.id);
