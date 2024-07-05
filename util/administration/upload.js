@@ -3,6 +3,7 @@ const path = require('path');
 const axios = require('axios');
 const crypto = require('crypto');
 const yaml = require('yaml');
+const embeds = require('../../util/embed');
 
 async function getBufferFromUrl(url) {
     try {
@@ -33,9 +34,9 @@ module.exports = {
             `${upload_id}.yaml`,
         );
 
-        // Metadata to save
         const metadata = {
-            uploader: interaction.user.username, // Assuming interaction.user contains the user info
+            uploader_id: interaction.user.id,
+            uploader_name: interaction.user.username,
             uploaded_at: new Date().toISOString(),
             original_filename: file.name,
             file_id: upload_id,
@@ -44,31 +45,41 @@ module.exports = {
         fs.writeFile(filePath, buffer, (err) => {
             if (err) {
                 console.error('Error writing file:', err);
-                return interaction.reply({
-                    content: 'There was an error saving the file.',
-                    ephemeral: true,
-                });
+                return embeds.errorEmbed(
+                    interaction,
+                    'Something went wrong while saving the file. Please try again.',
+                    null,
+                    false,
+                );
             }
             const yamlMetadata = yaml.stringify(metadata);
 
             fs.writeFile(metadataFilePath, yamlMetadata, (err) => {
                 if (err) {
-                    console.error('Error writing metadata file:', err);
-                    return interaction.reply({
-                        content: 'There was an error saving the metadata.',
-                        ephemeral: true,
+                    fs.unlink(filePath, (err) => {
+                        if (err) {
+                            return embeds.errorEmbed(
+                                interaction,
+                                'Something went wrong while saving the metadata. Please try again.',
+                                null,
+                                false,
+                            );
+                        }
                     });
+
+                    try {
+                        return embeds.errorEmbed(
+                            interaction,
+                            'Something went wrong while saving the metadata. Please try again.',
+                            null,
+                            false,
+                        );
+                    } catch (error) {}
                 }
 
-                console.log(
-                    'File and metadata saved successfully:',
-                    filePath,
-                    metadataFilePath,
-                );
-                interaction.reply({
-                    content: `File uploaded successfully with ID: ${upload_id}`,
-                    ephemeral: true,
-                });
+                interaction.editReply({
+                    content: `https://cdn.noxirity.com/${upload_id}`
+                })
             });
         });
     },
