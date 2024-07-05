@@ -15,7 +15,7 @@ module.exports = {
     aliases: ['approve_value', 'reject_value'],
     async execute(interaction, client) {
         if (
-            !validateRoles(interaction.member, ['1258232753187717162'], 'one')
+            !validateRoles(interaction.member, ['1069023487647301692'], 'one')
         ) {
             return embeds.errorEmbed(
                 interaction,
@@ -26,8 +26,8 @@ module.exports = {
         }
 
         if (interaction.customId === 'approve_value') {
-            const item_name =
-                interaction.message.embeds[0].title.split(': ')[1];
+            const title = interaction.message.embeds[0].title;
+            const item_name = title.substring(title.indexOf(': ') + 2);
             const new_value =
                 interaction.message.embeds[0].fields[1].value.replace(/,/g, '');
             const image_url = interaction.message.embeds[0].thumbnail.url;
@@ -125,7 +125,10 @@ module.exports = {
             const public_channel = interaction.guild.channels.cache.get(
                 '1139839306790346822',
             );
-            await public_channel.send({ embeds: [embed] });
+            await public_channel.send({
+                embeds: [embed],
+                content: `<@&1145352839317704754>`,
+            });
 
             await processing_message.delete();
 

@@ -104,7 +104,7 @@ module.exports = {
     async autocomplete(interaction, client) {
         try {
             const value = interaction.options.getFocused();
-            const url = `https://catalog.roproxy.com/v1/search/items/details?Category=11&CreatorTargetId=1&Keyword=${value}`;
+            const url = `https://catalog.roproxy.com/v1/search/items/details?Category=1&CreatorTargetId=1&Keyword=${value}`;
             const response = await fetch(url);
             const data = await response.json();
 

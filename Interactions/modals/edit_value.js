@@ -24,8 +24,12 @@ module.exports = {
             const new_value = calculateExpression(
                 interaction.fields.getTextInputValue('value'),
             );
-            const reason = interaction.fields.getTextInputValue('reason');
-            const proof = interaction.fields.getTextInputValue('proof');
+            const reason =
+                interaction.fields.getTextInputValue('reason') ||
+                'No reason provided.';
+            const proof =
+                interaction.fields.getTextInputValue('proof') ||
+                'No proof provided.';
 
             // const has_three_links = ((s) => {
             //     const pattern =
@@ -57,9 +61,9 @@ module.exports = {
                     true,
                 );
 
-            let requires_approval = false;
-            if ((item.value || 0) * 2 <= new_value) requires_approval = true;
-            if (new_value >= 25000000) requires_approval = true;
+            let requires_approval =
+                ((item.value || 0) * 2 <= new_value || new_value >= 25000000) &&
+                !(item.value === 0);
 
             if (requires_approval) {
                 interaction.reply({
@@ -134,7 +138,7 @@ module.exports = {
                     reason: `Requested by ${interaction.user.username}`,
                     message: {
                         content:
-                            '<@&11069023487647301692> <@&1213276024020934666>',
+                            '<@&1069023487647301692> <@&1213276024020934666>',
                         embeds: [embed],
                         components: [
                             new ActionRowBuilder().addComponents([
@@ -210,7 +214,10 @@ module.exports = {
                 const public_channel = interaction.guild.channels.cache.get(
                     '1139839306790346822',
                 );
-                await public_channel.send({ embeds: [embed] });
+                await public_channel.send({
+                    embeds: [embed],
+                    content: '<@&1145352839317704754>',
+                });
 
                 fields.push({
                     name: 'Proof',

@@ -231,7 +231,7 @@ async function checkForClearance(interaction, client) {
             return false;
         }
 
-        if (Number(quantity_or_duration) > 70) {
+        if (Number(quantity_or_duration) < 70) {
             const auto_dropper = (await getDatabase('ArcadeHaven')).collection(
                 'auto_dropper',
             );
