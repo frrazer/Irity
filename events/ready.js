@@ -37,7 +37,7 @@ module.exports = {
                     type: ActivityType.Playing,
                 },
             ],
-            status: 'dnd',
+            status: 'invisible',
         });
 
         usageMonitor(client);

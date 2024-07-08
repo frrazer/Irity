@@ -21,6 +21,8 @@ async function getBufferFromUrl(url) {
 
 module.exports = {
     async execute(interaction, client) {
+        await interaction.deferReply();
+
         const file = interaction.options.getAttachment('file');
         const buffer = await getBufferFromUrl(file.url);
         const upload_id = crypto.randomBytes(5).toString('hex');
