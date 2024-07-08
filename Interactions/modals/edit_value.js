@@ -62,8 +62,9 @@ module.exports = {
                 );
 
             let requires_approval =
-                ((item.value || 0) * 2 <= new_value || new_value >= 25000000) &&
-                !(item.value === 0);
+                (item.value === 0 && new_value >= 25000000) ||
+                (item.value > 0 &&
+                    (new_value >= 25000000 || new_value >= item.value * 2));
 
             if (requires_approval) {
                 interaction.reply({
