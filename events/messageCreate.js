@@ -92,6 +92,7 @@ module.exports = {
         });
       }
     } else if (!message.author.bot) {
+      // message.react("🍣")
       handleRegularMessage(message, client);
     } else {
       transactionMonitor(message);
