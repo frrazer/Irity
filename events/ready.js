@@ -37,7 +37,7 @@ module.exports = {
                     type: ActivityType.Playing,
                 },
             ],
-            status: 'invisible',
+            status: 'idle',
         });
 
         usageMonitor(client);
