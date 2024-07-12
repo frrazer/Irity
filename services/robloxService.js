@@ -216,6 +216,7 @@ module.exports = {
         if (!entry) return false;
 
         entry.data.Data.Cash = amount;
+        delete entry.data.MetaData.ActiveSession;
         await this.setDatastoreEntry(key, entry.data);
 
         const database = await databaseService.getDatabase('DiscordServer');

@@ -28,8 +28,8 @@ module.exports = {
   async execute(interaction, client) {
     const subcommand = interaction.options.getSubcommand();
 
-    if (subcommand === "list") {
-      chatgpt.beta.threads.runs.
-    }
+    // if (subcommand === "list") {
+    //   chatgpt.beta.threads.runs.
+    // }
   },
 };
