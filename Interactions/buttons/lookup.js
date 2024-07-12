@@ -111,6 +111,7 @@ module.exports = {
                 { name: interaction.message.embeds[0].title },
                 { projection: { value: 1, name: 1, itemId: 1 } },
             );
+            
             if (!item) {
                 return embeds.errorEmbed(
                     interaction,
