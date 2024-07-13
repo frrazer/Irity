@@ -1,4 +1,5 @@
 const databaseService = require("../services/databaseService");
+const { updateMessageContent } = require("../events/messageCreate")
 const embeds = require("../util/embed");
 const {
   EmbedBuilder,
@@ -392,6 +393,7 @@ async function handleEditCommand(panelId, panels, message, args) {
   let messages_to_delete = [ask_msg];
   collector.on("collect", async (m) => {
     if (m.author.id !== message.author.id) return;
+    await updateMessageContent(m)
     collector.stop();
     ask_msg.edit({
       embeds: [
@@ -534,7 +536,7 @@ async function handleAddButtonCommand(panelId, panels, message) {
 
   collector.on("collect", async (m) => {
     if (m.author.id !== message.author.id) return;
-
+    await updateMessageContent(m)
     const content = m.content;
     if (content.length > 80 || content.length < 1) {
       const invalid_msg = await embeds.errorEmbed(
@@ -621,6 +623,7 @@ async function handleAddButtonCommand(panelId, panels, message) {
 
   collector.on("collect", async (m) => {
     if (m.author.id !== message.author.id) return;
+    await updateMessageContent(m)
     const content = m.content.toLowerCase();
     if (!valid_style_choices[content]) {
       const invalid_msg = await embeds.errorEmbed(
@@ -669,6 +672,7 @@ async function handleAddButtonCommand(panelId, panels, message) {
 
     collector.on("collect", async (m) => {
       if (m.author.id !== message.author.id) return;
+      await updateMessageContent(m)
       const content = m.content;
       if (!content.startsWith("http")) {
         const invalid_msg = await m.reply("Invalid URL.");
@@ -831,6 +835,7 @@ async function handleAddButtonCommand(panelId, panels, message) {
 
   collector.on("collect", async (m) => {
     if (m.author.id !== message.author.id) return;
+    await updateMessageContent(m)
     const content = m.content;
     if (content.length > 80 || content.length < 1) {
       const invalid_msg = await embeds.errorEmbed(
@@ -1104,7 +1109,7 @@ async function handleAddDropdownCommand(panelId, panels, message) {
 
   collector.on("collect", async (m) => {
     if (m.author.id !== message.author.id) return;
-
+    await updateMessageContent(m)
     const content = m.content;
     if (content.length > 80 || content.length < 1) {
       const invalid_msg = await embeds.errorEmbed(
@@ -1152,6 +1157,7 @@ async function handleAddDropdownCommand(panelId, panels, message) {
 
   collector.on("collect", async (m) => {
     if (m.author.id !== message.author.id) return;
+    await updateMessageContent(m)
     const content = m.content;
     if (content == "none") {
       description = null;
@@ -1341,6 +1347,7 @@ async function handleAddDropdownCommand(panelId, panels, message) {
 
   collector.on("collect", async (m) => {
     if (m.author.id !== message.author.id) return;
+    await updateMessageContent(m)
     const content = m.content;
     if (content.length > 80 || content.length < 1) {
       const invalid_msg = await embeds.errorEmbed(
