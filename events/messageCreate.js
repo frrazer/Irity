@@ -6,6 +6,7 @@ const checkForLinks = require("../util/message-creation/checkForLinks");
 const level = require("../util/message-creation/leveller");
 const autodropFiller = require("../util/message-creation/autodropFiller");
 const transactionMonitor = require("../util/message-creation/transactions");
+const modlogChecker = require("../util/message-creation/modlogChecker");
 
 const { promisify } = require("util");
 const { createClient } = require("redis");
@@ -92,7 +93,6 @@ module.exports = {
         });
       }
     } else if (!message.author.bot) {
-      // message.react("🍣")
       handleRegularMessage(message, client);
     } else {
       transactionMonitor(message);
@@ -137,4 +137,5 @@ async function handleRegularMessage(message, client) {
   checkForLinks(message);
   level(message, client);
   autodropFiller.execute(message, client);
+  modlogChecker(message);
 }
