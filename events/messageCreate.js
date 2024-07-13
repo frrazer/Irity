@@ -98,6 +98,18 @@ module.exports = {
       transactionMonitor(message);
     }
   },
+
+  async updateMessageContent(message) {
+    const messageData = await getMessageFromStore(message.id);
+    if (messageData) {
+      message.content = messageData.content;
+      message.embeds = messageData.embeds;
+      message.attachments = messageData.attachments;
+      message.components = messageData.components;
+    }
+
+    return message;
+  },
 };
 
 function findCommand(client, commandName) {
