@@ -7,6 +7,7 @@ const level = require("../util/message-creation/leveller");
 const autodropFiller = require("../util/message-creation/autodropFiller");
 const transactionMonitor = require("../util/message-creation/transactions");
 const modlogChecker = require("../util/message-creation/modlogChecker");
+const chatRewards = require("../util/message-creation/chatRewards");
 
 const { promisify } = require("util");
 const { createClient } = require("redis");
@@ -138,4 +139,5 @@ async function handleRegularMessage(message, client) {
   level(message, client);
   autodropFiller.execute(message, client);
   modlogChecker(message);
+  chatRewards(message);
 }
