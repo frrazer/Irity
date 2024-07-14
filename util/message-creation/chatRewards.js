@@ -1,4 +1,8 @@
-const ALLOWED_CHANNELS = ["1157722854318673950"];
+const ALLOWED_CHANNELS = [
+  "1089320905395667045",
+  "1057313206604931273",
+  "1157722854318673950",
+];
 const CHANCE = 1; // 1%
 const API_URL = "https://api.noxirity.com/v1/ah/marketplace/GetInventory?id=1";
 const {
@@ -9,12 +13,33 @@ const {
 const databaseService = require("../../services/databaseService");
 const { abbreviateNumber } = require("../../util/functions");
 const { EmbedBuilder } = require("discord.js");
+const axios = require("axios");
 
 function percentageToOneInX(percentage) {
   if (percentage <= 0) {
     return "Invalid percentage value";
   }
   return Math.round(1 / (percentage / 100));
+}
+
+async function refreshInventory(user_id) {
+  const url =
+    "https://apis.roblox.com/messaging-service/v1/universes/4570608156/topics/GlobalSystems";
+  await axios({
+    method: "POST",
+    url: url,
+    headers: {
+      "x-api-key": process.env.MESSAGING_SERVICE_KEY,
+      "content-type": "application/json",
+    },
+    data: {
+      message: JSON.stringify({
+        system: "Admin",
+        method: "RefreshInv",
+        userId: user_id,
+      }),
+    },
+  });
 }
 
 module.exports = async function (message) {
@@ -114,6 +139,8 @@ module.exports = async function (message) {
     await message.reply({
       embeds: [embed],
     });
+
+    await refreshInventory(user_id);
   } else {
     console.log("No item awarded.");
     return;

@@ -232,6 +232,11 @@ async function checkForClearance(interaction, client) {
         }
 
         if (Number(quantity_or_duration) < 70) {
+            return embeds.errorEmbed(
+                interaction,
+                'You cannot queue "good" items at this time.',
+            );
+
             const auto_dropper = (await getDatabase('ArcadeHaven')).collection(
                 'auto_dropper',
             );
