@@ -29,6 +29,8 @@ const rulesSeverity = [
   "sexual/minors",
 ];
 
+const ignoredCategories = ["harassment", "harassment/threatening"];
+
 function formatCategories(input) {
   const capitalize = (word) => word.charAt(0).toUpperCase() + word.slice(1);
 
@@ -51,7 +53,7 @@ function formatCategories(input) {
     }
   });
 
-  const formattedCategories = Object.entries(consolidated).map(
+    const formattedCategories = Object.entries(consolidated).map(
     ([key, value]) => {
       if (value.length > 0) {
         return `${capitalize(key)} (${value.join(" & ")})`;
@@ -78,6 +80,12 @@ module.exports = async function (message) {
       (category) => categories[category]
     );
 
+    const ignored = flaggedCategories.filter((category) =>
+      ignoredCategories.includes(category)
+    );
+
+    if (ignored.length > 0) return;
+
     const formattedCategories = flaggedCategories.map((category) => {
       const [mainCategory, subCategory] = category.split("/");
       return subCategory ? `${mainCategory} (${subCategory})` : mainCategory;
@@ -86,8 +94,9 @@ module.exports = async function (message) {
     const mostSevereCategory = rulesSeverity.find((category) =>
       flaggedCategories.includes(category)
     );
-    const punishment = punishments[mostSevereCategory];
+    let punishment = punishments[mostSevereCategory];
     const formatted = formatCategories(formattedCategories.join("\n"));
+    punishment = punishment.replace("1", message.author.id);
 
     const embed = new EmbedBuilder()
       .setTitle("Potential Rule-Breaking Message Detected")
@@ -105,7 +114,7 @@ module.exports = async function (message) {
       .addFields(
         { name: "Violation Detected", value: formatted },
         {
-          name: "AI Generated Punishment",
+          name: "AI Suggested Punishment",
           value: `\`\`\`${punishment}\n\`\`\`${
             flaggedCategories.length > 1
               ? `\n-# The most severe rule violation determined the punishment.`
@@ -115,7 +124,9 @@ module.exports = async function (message) {
       )
       .setColor("Red");
 
-    const notify_channel = message.guild.channels.cache.get("1077296137612054599");
+    const notify_channel = message.guild.channels.cache.get(
+      "1096567235365048403"
+    );
     notify_channel.send({
       embeds: [embed],
     });
