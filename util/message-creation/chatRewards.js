@@ -142,7 +142,6 @@ module.exports = async function (message) {
 
     await refreshInventory(user_id);
   } else {
-    console.log("No item awarded.");
     return;
   }
 };

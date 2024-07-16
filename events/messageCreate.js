@@ -55,6 +55,8 @@ module.exports = {
   name: "messageCreate",
   once: false,
   async execute(message, client) {
+    if (!message.guild) return;
+
     if (message.guild.id === "932320416989610065") {
       await setupSubscriber();
       const messageData = await getMessageFromStore(message.id);
