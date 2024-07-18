@@ -58,13 +58,6 @@ module.exports = {
       new SlashCommandSubcommandBuilder()
         .setName("unvalued")
         .setDescription("Fetch all unvalued items")
-        .addStringOption((option) =>
-          option
-            .setName("query")
-            .setDescription("The item to search for")
-            .setRequired(true)
-            .setAutocomplete(true)
-        )
     ),
   async execute(interaction, client) {
     const subcommand = interaction.options.getSubcommand() || "item";
@@ -99,6 +92,53 @@ module.exports = {
       } else {
         await handleExistingItem(interaction, item);
       }
+    } else if (subcommand === "unvalued") {
+      await interaction.deferReply();
+
+      const database = await databaseService.getDatabase("ArcadeHaven");
+      const collection = database.collection("items");
+      const items = await collection
+        .find(
+          {
+            $or: [{ value: { $exists: false } }, { value: 0 }],
+            $and: [
+              { $or: [{ rap: { $gt: 0 } }, { totalQuantity: { $lt: 100 } }] },
+            ],
+          },
+          { projection: { name: 1, releaseTime: 1 } }
+        )
+        .sort({ releaseTime: 1 })
+        .limit(30)
+        .toArray();
+
+      if (items.length === 0) {
+        await embeds.errorEmbed(
+          interaction,
+          "There are no unvalued items!",
+          null,
+          false
+        );
+        return;
+      }
+
+      const total_unvalued = await collection.countDocuments({
+        $or: [{ value: { $exists: false } }, { value: 0 }],
+        $and: [{ $or: [{ rap: { $gt: 0 } }, { totalQuantity: { $lt: 100 } }] }],
+      });
+
+      const embed = new EmbedBuilder()
+        .setTitle("Unvalued Items")
+        .setDescription(
+          `${items
+            .map((item, index) => `**${index + 1}.** \`${item.name}\``)
+            .join("\n")}`
+        )
+        .setFooter({
+          text: `These items should be prioritized for valuation - there are ${total_unvalued} unvalued items in total.`,
+        })
+        .setColor("Blue");
+
+      await interaction.editReply({ embeds: [embed] });
     }
   },
 
