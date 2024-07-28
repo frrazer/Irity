@@ -7,10 +7,13 @@ async function errorEmbed(
   description,
   footer,
   ephemeral,
-  returnEmbed
+  returnEmbed,
+  customEmoji
 ) {
   const errorEmbed = new EmbedBuilder()
-    .setDescription(`<:tt_er:1187754755435548742> ${description}`)
+    .setDescription(
+      `${customEmoji || "<:tt_er:1187754755435548742>"} ${description}`
+    )
     .setColor(COLOURS.red);
 
   if (footer) {
@@ -47,11 +50,14 @@ async function successEmbed(
   description,
   footer,
   ephemeral,
-  returnEmbed
+  returnEmbed,
+  customEmoji
 ) {
   footer = footer || " ";
   const successEmbed = new EmbedBuilder()
-    .setDescription(`<:tt_ys:1187754951171125249> ${description}`)
+    .setDescription(
+      `${customEmoji || "<:tt_ys:1187754951171125249>"} ${description}`
+    )
     .setColor(COLOURS.green)
     .setFooter({ text: `${footer}` });
 
@@ -80,10 +86,19 @@ async function successEmbed(
   return message;
 }
 //? Neutral Embed.
-async function neutralEmbed(interaction, description, footer, ephemeral, returnEmbed) {
+async function neutralEmbed(
+  interaction,
+  description,
+  footer,
+  ephemeral,
+  returnEmbed,
+  customEmoji
+) {
   footer = footer || " ";
   const neutralEmbed = new EmbedBuilder()
-    .setDescription(`<:tt_box:1238796231199821916> ${description}`)
+    .setDescription(
+      `${customEmoji || "<:tt_box:1238796231199821916>"} ${description}`
+    )
     .setColor("#949494")
     .setFooter({ text: `${footer}` });
 

@@ -32,6 +32,8 @@ function parseModActionString(input) {
   return result;
 }
 
+const databaseService = require("../../services/databaseService");
+
 module.exports = async function (message) {
   if (message.channel.id !== "1182035992996229161") return;
 
@@ -67,6 +69,29 @@ module.exports = async function (message) {
   if (!["mute", "ban", "kick", "warn"].includes(log.modAction)) {
     log.modAction = "other";
   }
+
+  const db = await databaseService.getDatabase("DiscordServer");
+  const collection = db.collection("CasinoEmpireModlogs");
+
+  await collection.updateOne(
+    {
+      userId: log.userId,
+    },
+    {
+      $push: {
+        logs: {
+          modAction: log.modAction,
+          duration: log.duration,
+          reason: log.reason,
+          timestamp: new Date(),
+          messageId: message.id,
+        },
+      },
+    },
+    {
+      upsert: true,
+    }
+  );
 
   if (log.modAction === "mute" && !log.duration) {
     await message.react(reactions.no_duration_error);

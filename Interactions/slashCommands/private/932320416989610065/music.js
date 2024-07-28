@@ -74,7 +74,7 @@ const settings = {
                 .setDescription("The level you want to set.")
                 .setRequired(true)
                 .setMinValue(0)
-                .setMaxValue(5)
+                .setMaxValue(500)
         )
 }
 

@@ -3,7 +3,7 @@ const {
   AttachmentBuilder,
   ActivityType,
   AuditLogEvent,
-  ChannelType
+  ChannelType,
 } = require("discord.js");
 const config = require("../util/config.json");
 const { convertTime } = require("../util/functions");
@@ -18,8 +18,6 @@ const activeCodeMonitor = require("../util/bot-monitors/activeCodeMonitor");
 const autodropMonitor = require("../util/bot-monitors/autodropMonitor");
 const messageServer = require("../util/bot-monitors/messageServer");
 const offsaleItemMonitor = require("../util/bot-monitors/offsaleItemMonitor");
-
-const { joinVoiceChannel } = require("@discordjs/voice");
 
 module.exports = {
   name: "ready",
