@@ -352,7 +352,7 @@ module.exports = {
         const bet = allBets[i];
         historyString += `**${i + 1}.** \`${bet.id}\` (${bet.mode} <t:${
           bet.time
-        }:R>)\n`;
+        }:R>) ${bet.profit > 0 ? "<:green_dot:1264285521476190300>" : "<:grey_dot:1264285450995105823>"}\n`;
       }
 
       if (historyString === "") {
@@ -624,7 +624,7 @@ module.exports = {
 
           const raw = JSON.stringify(document.value, null, 2);
           const doc_id = require("crypto").randomBytes(4).toString("hex");
-          const path = `/var/www/irity-content/documents/${doc_id}`;
+          const path = `/var/www/irity-content/${doc_id}`;
           fs.writeFileSync(path, raw);
 
           interaction.editReply({

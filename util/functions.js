@@ -140,9 +140,15 @@ function convertTime(ms) {
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
 
-  if (days > 0) {
-    return days + "d"; // Return days if there are any
+  if (months > 0) {
+    return months + "mo"; // Return months if there are any
+  } else if (weeks > 0) {
+    return weeks + "w"; // Return weeks if there are no months
+  } else if (days > 0) {
+    return days + "d"; // Return days if there are no weeks
   } else if (hours > 0) {
     return hours + "h"; // Return hours if there are no days
   } else if (minutes > 0) {
@@ -151,6 +157,7 @@ function convertTime(ms) {
     return seconds + "s"; // Return seconds if there are no minutes
   }
 }
+
 function abbreviateNumber(num) {
   let isNegative = num < 0; // Check if the number is negative
   let absNum = Math.abs(num); // Work with the absolute value for abbreviation

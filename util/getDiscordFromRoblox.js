@@ -13,7 +13,10 @@ module.exports = async function (roblox_id) {
     console.log(`Checking cache for Roblox ID: ${roblox_id}`);
     const cachedData = await collection.findOne({ RobloxID: roblox_id });
 
-    if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
+    if (
+      (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) ||
+      cachedData.DontOverwrite
+    ) {
       console.log(`Cache hit for Roblox ID: ${roblox_id}`);
       return [true, cachedData.DiscordID];
     }

@@ -21,9 +21,8 @@ const subscriber = redisClient.duplicate();
 
 async function setupSubscriber() {
   if (!isConnected) {
-    await subscriber.connect();
     isConnected = true;
-
+    await subscriber.connect();
     await subscriber.subscribe("irity-message-create", (message) => {
       const data = JSON.parse(message);
       const message_id = data.message_id;

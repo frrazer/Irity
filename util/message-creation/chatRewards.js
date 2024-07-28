@@ -3,7 +3,7 @@ const ALLOWED_CHANNELS = [
   "1057313206604931273",
   "1157722854318673950",
 ];
-const CHANCE = 1; // 1%
+const CHANCE = 0; // 1%
 const API_URL = "https://api.noxirity.com/v1/ah/marketplace/GetInventory?id=1";
 const {
   getIdFromUsername,
@@ -14,8 +14,6 @@ const databaseService = require("../../services/databaseService");
 const { abbreviateNumber } = require("../../util/functions");
 const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
-const fetch = require("node-fetch");
-const AbortController = require("abort-controller");
 
 function percentageToOneInX(percentage) {
   if (percentage <= 0) {
@@ -44,77 +42,68 @@ async function refreshInventory(user_id) {
   });
 }
 
+async function getEligibleItems(database, userId) {
+  const collection = database.collection("items");
+  const twelve_hours_ago = Math.floor((Date.now() - 43200000) / 1000);
+
+  return collection
+    .find(
+      {
+        "serials.u": parseInt(userId),
+        releaseTime: { $lt: twelve_hours_ago },
+        rap: { $gte: 1 },
+      },
+      {
+        projection: {
+          itemId: 1,
+          serials: 1,
+          name: 1,
+          value: 1,
+          rap: 1,
+          releaseTime: 1,
+        },
+      }
+    )
+    .toArray();
+}
+
 module.exports = async function (message) {
   if (!ALLOWED_CHANNELS.includes(message.channel.id)) return;
 
   if (Math.random() < CHANCE / 100) {
     const user_id = await getIdFromUsername(message.member.nickname);
     const username = await getUsernameFromId(user_id);
+    const items = await getEligibleItems(
+      await databaseService.getDatabase("ArcadeHaven"),
+      user_id
+    );
 
-    // Adding a timeout for the HTTP request
-    const controller = new AbortController();
-    const timeout = setTimeout(() => {
-      controller.abort();
-    }, 20000);
-
-    let response;
-    try {
-      response = await fetch(API_URL, { signal: controller.signal });
-    } catch (error) {
-      if (error.name === "AbortError") {
-        console.error("Fetch request timed out");
-        return;
-      }
-      throw error;
-    } finally {
-      clearTimeout(timeout);
+    if (!items.length) {
+      console.log("No eligible items found");
+      return;
     }
 
-    const data = (await response.json()).data;
-    let all_items = [];
+    const item_data = items[Math.floor(Math.random() * items.length)];
+    const eligible_serials = item_data.serials.filter(
+      (serial) => serial.u === 1
+    );
+    const serial = Math.floor(Math.random() * eligible_serials.length);
+    const item_id = item_data.itemId;
 
-    for (const item_id in data) {
-      data[item_id].forEach((serial) => {
-        all_items.push(`${item_id}-${serial}`);
-      });
-    }
-
-    let item_data = null;
-    let attempts = 0;
-    const db = await databaseService.getDatabase("ArcadeHaven");
-    const col = db.collection("items");
-    let item_id, serial;
-
-    const twelve_hours_ago = Math.floor((Date.now() - 43200000) / 1000);
-
-    while (!item_data && attempts < 500) {
-      let random_item = all_items[Math.floor(Math.random() * all_items.length)];
-      [item_id, serial] = random_item.split("-");
-
-      item_data = await col.findOne(
-        {
-          itemId: Number(item_id),
-          releaseTime: { $lt: twelve_hours_ago },
-          rap: { $gte: 1 },
-        },
-        {
-          projection: { name: 1, value: 1, rap: 1, releaseTime: 1 },
-        }
-      );
-
-      attempts++;
-      if (item_data) break;
-    }
     if (!item_data) return;
 
-    await col.updateOne(
+    const col = (await databaseService.getDatabase("ArcadeHaven")).collection(
+      "items"
+    );
+
+    const res = await col.updateOne(
       { itemId: Number(item_id) },
       {
         $set: {
-          [`serials.${Number(serial) - 1}.u`]: Number(user_id),
+          [`serials.${Number(serial)}.u`]: Number(user_id),
         },
         $push: {
-          [`serials.${Number(serial) - 1}.h`]: [
+          [`serials.${Number(serial)}.h`]: [
             "discord_chat_reward",
             Number(user_id),
             1,
@@ -127,13 +116,13 @@ module.exports = async function (message) {
       }
     );
 
-    const { name, value, rap, releaseTime } = item_data;
+    if (res.modifiedCount === 0) {
+      console.log(Number(item_id), Number(serial));
+      console.error("Failed to update item serials");
+      return;
+    }
 
-    // Fetching the thumbnail with a timeout
-    const thumbnailController = new AbortController();
-    const thumbnailTimeout = setTimeout(() => {
-      thumbnailController.abort();
-    }, 20000);
+    const { name, value } = item_data;
 
     let thumbnail;
     try {
@@ -157,13 +146,11 @@ module.exports = async function (message) {
       }
     }
 
-    const one_in_x = abbreviateNumber(
-      percentageToOneInX((CHANCE / 100) * (1 / attempts))
-    );
+    const one_in_x = abbreviateNumber(percentageToOneInX(CHANCE / 100));
 
     const embed = new EmbedBuilder()
       .setTitle(
-        value >= 20000000 ? "LUCKY CHAT REWARD 🎉🎉🎉" : "Chat Reward 🎊"
+        value >= 2000000 ? "LUCKY CHAT REWARD 🎉🎉🎉" : "Chat Reward 🎊"
       )
       .setDescription(
         `<@${
@@ -172,9 +159,9 @@ module.exports = async function (message) {
           item_data.value || item_data.rap
         )}) for being active in chat!\n\n-# This item was sent to Roblox user "${username}". [View Profile](https://www.roblox.com/users/${user_id}/profile)\n`
       )
-      .setColor(value >= 20000000 ? "Gold" : "Blue")
+      .setColor(value >= 2000000 ? "Gold" : "Blue")
       .setAuthor({
-        name: `One in ${one_in_x} chance!`,
+        name: `One in ${one_in_x} chance! (Serial: ${Number(serial) + 1})`,
         iconURL:
           "https://cdn.discordapp.com/emojis/1249357547605987438.webp?size=96&quality=lossless",
       });
@@ -185,7 +172,7 @@ module.exports = async function (message) {
       embeds: [embed],
     });
 
-    if (value >= 20000000) {
+    if (value >= 2000000) {
       await reply.react("🎉");
     }
 

@@ -1,11 +1,14 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { convertTime } = require("../../../util/functions");
 const { errorEmbed } = require("../../../util/embed");
+const os = require("os");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("stats")
     .setDescription("Shows the bot's stats."),
+  contexts: [0, 1, 2],
+  integration_types: [0, 1],
   async execute(interaction, client) {
     const ping = Date.now() - interaction.createdTimestamp;
     await interaction.reply({
@@ -35,7 +38,8 @@ module.exports = {
         );
         const ramUsage = client.ramUsage;
         const cpuUsage = client.cpuUsage;
-        const uptime = Date.now() - client.startTimestamp;
+        const uptime = os.uptime();
+        console.log(uptime);
 
         if (ramUsage === undefined || cpuUsage === undefined) {
           return errorEmbed(
@@ -53,7 +57,7 @@ module.exports = {
             {
               name: "📶 Connection",
               value: `Latency: \`${ping}ms\`\nUptime: \`${convertTime(
-                uptime
+                uptime * 1000
               )}\``,
               inline: true,
             },

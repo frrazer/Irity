@@ -102,7 +102,7 @@ module.exports = {
           {
             $or: [{ value: { $exists: false } }, { value: 0 }],
             $and: [
-              { $or: [{ rap: { $gt: 0 } }, { totalQuantity: { $lt: 100 } }] },
+              { $or: [{ rap: { $gt: 10 } }, { totalQuantity: { $lt: 100 } }] },
             ],
           },
           { projection: { name: 1, releaseTime: 1 } }
@@ -123,7 +123,7 @@ module.exports = {
 
       const total_unvalued = await collection.countDocuments({
         $or: [{ value: { $exists: false } }, { value: 0 }],
-        $and: [{ $or: [{ rap: { $gt: 0 } }, { totalQuantity: { $lt: 100 } }] }],
+        $and: [{ $or: [{ rap: { $gt: 10 } }, { totalQuantity: { $lt: 100 } }] }],
       });
 
       const embed = new EmbedBuilder()

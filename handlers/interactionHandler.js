@@ -9,7 +9,7 @@ const fs = require("fs");
 module.exports = (client) => {
   const commandArray = [];
   const guildCommandArrays = {};
-  const isDevMode = process.argv.includes('dev');
+  const isDevMode = process.argv.includes("dev");
 
   //! Slash Command Files.
 
@@ -36,7 +36,17 @@ module.exports = (client) => {
 
       guildCommandArrays[guildId].push(slashCommandFile.data.toJSON());
     } else {
-      commandArray.push(slashCommandFile.data.toJSON());
+      const json = slashCommandFile.data.toJSON();
+      if (slashCommandFile.contexts) {
+        json.contexts = slashCommandFile.contexts;
+      }
+
+      if (slashCommandFile.integration_types) {
+        json.integration_types = slashCommandFile.integration_types;
+      }
+
+      commandArray.push(json);
+      console.log(json)
     }
 
     client.slashCommands.set(slashCommandFile.data.name, slashCommandFile);
@@ -79,21 +89,31 @@ module.exports = (client) => {
       `\x1b[38;2;67;170;139m[Modals] \x1b[32m${modalFile.name}\x1b[0m has been loaded.`
     );
   }
-  const rest = new REST({ version: "9" }).setToken(isDevMode ? process.env.DEV_BOT_TOKEN : process.env.BOT_TOKEN);
+  const rest = new REST({ version: "9" }).setToken(
+    isDevMode ? process.env.DEV_BOT_TOKEN : process.env.BOT_TOKEN
+  );
   (async () => {
     try {
       // Deploy global commands
-      await rest.put(Routes.applicationCommands(isDevMode ? DEV_CLIENT_ID : CLIENT_ID), {
-        body: commandArray,
-      });
+      await rest.put(
+        Routes.applicationCommands(isDevMode ? DEV_CLIENT_ID : CLIENT_ID),
+        {
+          body: commandArray,
+        }
+      );
 
       // Deploy guild-specific commands
       for (const guildId in guildCommandArrays) {
-        await rest.put(Routes.applicationGuildCommands(isDevMode ? DEV_CLIENT_ID : CLIENT_ID, guildId), {
-          body: guildCommandArrays[guildId],
-        });
+        await rest.put(
+          Routes.applicationGuildCommands(
+            isDevMode ? DEV_CLIENT_ID : CLIENT_ID,
+            guildId
+          ),
+          {
+            body: guildCommandArrays[guildId],
+          }
+        );
       }
-
     } catch (error) {
       console.error(error);
     }

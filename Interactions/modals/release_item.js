@@ -6,13 +6,17 @@ const { getDatabase } = require("../../services/databaseService");
 const MINIMUM_PRICES = {
   // quantity: price
   // if quantity is less than x, price must be greater than y
-  50: 3000000,
-  60: 2500000,
-  70: 2000000,
-  80: 1000000,
-  90: 500000,
-  100: 250000,
-  10000: 10000,
+  5: 4347826,
+  10: 2173913,
+  20: 1739130,
+  40: 1521739,
+  50: 1304348,
+  60: 1086957,
+  70: 869565,
+  80: 434783,
+  90: 217391,
+  100: 108696,
+  10000: 4348,
 };
 
 module.exports = {
@@ -208,19 +212,13 @@ async function checkForClearance(interaction, client) {
     return false;
   }
 
-  if (price <= 0 || price > 1000000) {
-    embeds.errorEmbed(interaction, "Price must be between $0 and $1,000,000.");
-
-    return false;
-  }
-
   const quantity_or_duration = interaction.fields.getTextInputValue("quantity");
 
   if (Number(quantity_or_duration)) {
-    if (Number(quantity_or_duration) <= 30) {
+    if (Number(quantity_or_duration) <= 15) {
       embeds.errorEmbed(
         interaction,
-        "You do not have permission to drop items with a quantity of 30 or less."
+        "You do not have permission to drop items with a quantity of 15 or less."
       );
 
       return false;
@@ -249,10 +247,10 @@ async function checkForClearance(interaction, client) {
     }
 
     if (Number(quantity_or_duration) < 100) {
-      if (Number(quantity_or_duration) < 50) {
+      if (Number(quantity_or_duration) < 15) {
         embeds.errorEmbed(
           interaction,
-          "You do not have permission to drop items with a quantity of 50 or less."
+          "You do not have permission to drop items with a quantity of 15 or less."
         );
 
         return false;
@@ -262,7 +260,7 @@ async function checkForClearance(interaction, client) {
         "auto_dropper"
       );
       const count = await auto_dropper.countDocuments({
-        quantity: { $lte: 50 },
+        quantity: { $lte: 130 },
         dropped: { $ne: true },
       });
       const total = await auto_dropper.countDocuments({

@@ -48,16 +48,26 @@ module.exports = {
       const db = await getDatabase("ArcadeHaven");
       const items = db.collection("items");
       const item = await items.findOne(
-        { name: interaction.message.embeds[0].title },
-        { projection: { value: 1, itemId: 1, name: 1 } }
+        {
+          name: {
+            $regex: `^\\s*${interaction.message.embeds[0].title.replace(
+              /\$/g,
+              "\\$"
+            )}\\s*$`,
+          },
+        },
+        {
+          projection: { projected: 1, name: 1, itemId: 1 },
+        }
       );
+
       if (!item)
         return embeds.errorEmbed(interaction, "Item not found.", null, true);
 
+      let current_value = item.value || 0;
       let requires_approval =
-        (item.value === 0 && new_value >= 25000000) ||
-        (item.value > 0 &&
-          (new_value >= 25000000 || new_value >= item.value * 2));
+        (current_value === 0 && new_value >= 25000000) ||
+        (current_value > 0 && new_value > current_value * 2);
 
       if (requires_approval) {
         interaction.reply({
