@@ -46,7 +46,6 @@ module.exports = (client) => {
       }
 
       commandArray.push(json);
-      console.log(json)
     }
 
     client.slashCommands.set(slashCommandFile.data.name, slashCommandFile);

@@ -18,6 +18,7 @@ const activeCodeMonitor = require("../util/bot-monitors/activeCodeMonitor");
 const autodropMonitor = require("../util/bot-monitors/autodropMonitor");
 const messageServer = require("../util/bot-monitors/messageServer");
 const offsaleItemMonitor = require("../util/bot-monitors/offsaleItemMonitor");
+const giveawayMonitor = require("../util/bot-monitors/giveawayMonitor");
 
 module.exports = {
   name: "ready",
@@ -42,6 +43,7 @@ module.exports = {
 
     usageMonitor(client);
     messageServer(client);
+    giveawayMonitor(client);
 
     const isDevMode = process.argv.includes("dev");
     if (!isDevMode) {
