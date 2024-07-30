@@ -158,6 +158,28 @@ function convertTime(ms) {
   }
 }
 
+function convertToSeconds(timeString) {
+  const timeUnits = {
+    second: 1,
+    minute: 60,
+    hour: 3600,
+    day: 86400,
+    week: 604800,
+    month: 2628000, // approximating a month as 30.44 days
+  };
+
+  const regex = /(\d+)\s*(second|minute|hour|day|week|month)s?/i;
+  const match = timeString.match(regex);
+
+  if (match) {
+    const value = parseInt(match[1], 10);
+    const unit = match[2].toLowerCase();
+    return value * timeUnits[unit];
+  } else {
+    throw new Error("Invalid time string format");
+  }
+}
+
 function abbreviateNumber(num) {
   let isNegative = num < 0; // Check if the number is negative
   let absNum = Math.abs(num); // Work with the absolute value for abbreviation
@@ -307,4 +329,5 @@ module.exports = {
   calculateExpression,
   expandNumber,
   validateRoles,
+  convertToSeconds,
 };

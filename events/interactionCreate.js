@@ -8,8 +8,8 @@ module.exports = {
       `${interaction.user.tag} in #${interaction.channel.name} triggered an interaction.`
     );
 
-    const isDevMode = process.argv.includes('dev');
-    const developerIds = ["406163086978842625", "733707800345051216"]
+    const isDevMode = process.argv.includes("dev");
+    const developerIds = ["406163086978842625", "733707800345051216"];
     if (isDevMode && !developerIds.includes(interaction.user.id)) return;
 
     if (interaction.isCommand() || interaction.isContextMenuCommand())
@@ -120,7 +120,14 @@ async function selectMenuInteraction(interaction, client) {
     return interaction.deferUpdate();
   }
 
-  const selectMenu = client.selectMenus.get(interaction.customId);
+  const selectMenu =
+    client.selectMenus.get(interaction.customId) ||
+    client.selectMenus.find(
+      (selectMenu) =>
+        selectMenu.aliases && selectMenu.aliases.includes(interaction.customId)
+    );
+
+    console.log(interaction.customId)
   if (!selectMenu) {
     return interaction.reply({
       content: "`An error has occurred.`",
