@@ -215,10 +215,10 @@ async function checkForClearance(interaction, client) {
   const quantity_or_duration = interaction.fields.getTextInputValue("quantity");
 
   if (Number(quantity_or_duration)) {
-    if (Number(quantity_or_duration) <= 15) {
+    if (Number(quantity_or_duration) <= 10) {
       embeds.errorEmbed(
         interaction,
-        "You do not have permission to drop items with a quantity of 15 or less."
+        "You do not have permission to drop items with a quantity of 10 or less."
       );
 
       return false;
@@ -260,7 +260,7 @@ async function checkForClearance(interaction, client) {
         "auto_dropper"
       );
       const count = await auto_dropper.countDocuments({
-        quantity: { $lte: 130 },
+        quantity: { $lte: 100 },
         dropped: { $ne: true },
       });
       const total = await auto_dropper.countDocuments({

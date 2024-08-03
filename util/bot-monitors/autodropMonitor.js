@@ -56,7 +56,7 @@ module.exports = async function (client) {
         return autodrop();
       }
 
-      const random_intervals = [50, 60, 70, 80];
+      const random_intervals = [90, 110, 130, 150, 170, 180];
       const next = new Date(
         now.getTime() +
           60000 *

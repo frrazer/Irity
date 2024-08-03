@@ -34,6 +34,7 @@ module.exports = {
       "--reboot",
       "--game --unbanwave",
       "--kill",
+      "--xpblacklist",
     ];
 
     if (!WHITELIST.includes(interaction.user.id)) {
@@ -80,7 +81,7 @@ module.exports = {
     } else if (command === "--reboot") {
       await neutralEmbed(
         interaction,
-        "An reboot has been requested for `Irity`.",
+        "A reboot has been requested for `Irity`.",
         null,
         false
       );
@@ -239,6 +240,13 @@ module.exports = {
           );
         }
       });
+    } else if (command == "--xpblacklist") {
+      successEmbed(
+        interaction,
+        "Auto-xp blacklist updated.",  
+        null,
+        false
+      );
     }
   },
 };

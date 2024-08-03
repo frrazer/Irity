@@ -6,6 +6,7 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 const embeds = require("../../util/embed");
+const calculateLevel = require("../../util/calculateLevel");
 
 module.exports = {
   async execute(interaction, client) {
@@ -37,6 +38,70 @@ module.exports = {
         ],
         ephemeral: true,
       });
+    }
+
+    // check requirements
+    const giveaway = await database.collection("IrityGiveaways").findOne({
+      message_id: giveaway_id,
+    });
+
+    if (!giveaway) {
+      return embeds.errorEmbed(
+        interaction,
+        "I couldn't find this giveaway, it may have ended or been deleted.",
+        null,
+        true
+      );
+    }
+
+    const requirements = giveaway.data.requirements;
+    if (requirements.boosting) {
+      // must have 932538393622085652 role
+      const member = interaction.member;
+      const has_role = member.roles.cache.has("932538393622085652");
+      if (!has_role) {
+        return embeds.errorEmbed(
+          interaction,
+          "You must be boosting the server to enter this giveaway!",
+          null,
+          true
+        );
+      }
+    }
+
+    if (requirements.level) {
+      const user = await database
+        .collection("CasinoEmpireLevelling")
+        .findOne({ user_id });
+      const xp = user ? user.tracking.xp : 0;
+      const level = calculateLevel(xp).currentLevel
+
+      console.log("level", level);
+      console.log("requirements.level", requirements.level);
+      console.log("xp", xp);
+
+      if (level < requirements.level) {
+        return embeds.errorEmbed(
+          interaction,
+          `You must be at least **Level ${requirements.level}** to enter this giveaway!`,
+          null,
+          true
+        );
+      }
+    }
+
+    if (requirements.roles) {
+      const member = interaction.member;
+      const roles = member.roles.cache;
+      const has_roles = requirements.roles.every((role) => roles.has(role));
+      if (!has_roles) {
+        return embeds.errorEmbed(
+          interaction,
+          "You must have the required roles to enter this giveaway!",
+          null,
+          true
+        );
+      }
     }
 
     await collection.insertOne({
