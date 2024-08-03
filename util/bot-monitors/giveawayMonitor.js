@@ -21,6 +21,14 @@ async function getWinners(giveaway_entries, message_id, total_winners) {
     ])
     .toArray();
 
+  await giveaway_entries.updateMany(
+    {
+      giveaway_id: message_id,
+      user_id: { $in: winners.map((entry) => entry.user_id) },
+    },
+    { $set: { won: true } }
+  );
+
   return winners.map((entry) => entry.user_id);
 }
 
@@ -69,9 +77,14 @@ async function giveawayMonitor(client, database, giveaways, giveaway_entries) {
         giveaway.data.total_winners
       );
 
-      const winnerMentions = winners.map((winner) => `<@${winner}>`).join(", ");
+      let winnerMentions = winners.map((winner) => `<@${winner}>`).join(", ");
       const current_description = message.embeds[0].description;
       const lines = current_description.split("\n");
+
+      if (winners.length === 0) {
+        winnerMentions = "No one";
+      }
+
       const new_description = `
         ${lines[0]}
         ${lines[1].replace("Ending", "Ended")}
@@ -94,9 +107,15 @@ async function giveawayMonitor(client, database, giveaways, giveaway_entries) {
 
       await giveaways.updateOne({ message_id }, { $set: { ended: true } });
 
-      message.reply({
-        content: `:tada: Congratulations ${winnerMentions}! You won the **${giveaway.data.reward}**!`,
-      });
+      if (winners.length > 0) {
+        message.reply({
+          content: `:tada: Congratulations ${winnerMentions}! You won the **${giveaway.data.reward}**!`,
+        });
+      } else {
+        message.reply({
+          content: `:cry: No one participated in the giveaway for **${giveaway.data.reward}**!`,
+        });
+      }
     } else {
       const current_amt = parseInt(
         message.components[0].components[0].label.match(/\d+/)[0]

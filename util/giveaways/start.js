@@ -11,6 +11,8 @@ module.exports = {
   async execute(interaction, client) {
     const code = interaction.options.getString("code");
     const channel = interaction.options.getChannel("channel");
+    const ping_role1 = interaction.options.getRole("role1");
+    const ping_role2 = interaction.options.getRole("role2");
 
     const database = await databaseService.getDatabase("DiscordServer");
     const collection = database.collection("IrityGiveaways");
@@ -26,8 +28,6 @@ module.exports = {
     const reward = giveaway.data.reward;
     const requirements = giveaway.data.requirements;
     const end_time = Math.floor(Date.now() / 1000 + duration);
-
-    // build the giveaway embed
 
     const requirementsArray = [
       requirements.boosting
@@ -75,9 +75,19 @@ module.exports = {
         .setDisabled(false),
     ];
 
+    let content = undefined;
+    if (ping_role1) {
+      content = `<@&${ping_role1.id}>`;
+    }
+
+    if (ping_role2) {
+      content = `${content} <@&${ping_role2.id}>`;
+    }
+
     const message = await channel.send({
       embeds: [embed],
       components: [new ActionRowBuilder().addComponents(buttons)],
+      content,
     });
 
     const giveaway_id = message.id;
