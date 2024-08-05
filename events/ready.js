@@ -19,6 +19,7 @@ const autodropMonitor = require("../util/bot-monitors/autodropMonitor");
 const messageServer = require("../util/bot-monitors/messageServer");
 const offsaleItemMonitor = require("../util/bot-monitors/offsaleItemMonitor");
 const giveawayMonitor = require("../util/bot-monitors/giveawayMonitor");
+const codeRedeemMonitor = require("../util/bot-monitors/codeRedeemMonitor");
 
 module.exports = {
   name: "ready",
@@ -41,9 +42,12 @@ module.exports = {
       status: "idle",
     });
 
+    const guild = client.guilds.cache.get("932320416989610065");
+    const channel = guild.channels.cache.get("1089320905395667045");
+    // channel.send(`<@&1057310687937953884>`);
+
     usageMonitor(client);
     messageServer(client);
-    giveawayMonitor(client);
 
     const isDevMode = process.argv.includes("dev");
     if (!isDevMode) {
@@ -52,6 +56,8 @@ module.exports = {
       activeCodeMonitor(client);
       autodropMonitor(client);
       offsaleItemMonitor(client);
+      codeRedeemMonitor(client);
+      giveawayMonitor(client);
     }
   },
 };
