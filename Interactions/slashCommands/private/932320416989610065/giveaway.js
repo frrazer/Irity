@@ -26,6 +26,18 @@ const settings = {
         .setName("channel")
         .setDescription("The channel to start the giveaway in.")
         .setRequired(true)
+    )
+    .addRoleOption((option) =>
+      option
+        .setName("role1")
+        .setDescription("The role to ping when the giveaway starts.")
+        .setRequired(false)
+    )
+    .addRoleOption((option) =>
+      option
+        .setName("role2")
+        .setDescription("The role to ping when the giveaway ends.")
+        .setRequired(false)
     ),
 };
 
