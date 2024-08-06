@@ -84,7 +84,6 @@ module.exports = {
             const user = interaction.options.getUser('user');
             const userPermissions = await permissionCheck(user.id);
             const description = userPermissions.length ? userPermissions.join('\n') : 'No permissions found for this user';
-            console.log(userPermissions);
 
             const embed = new EmbedBuilder()
                 .setTitle('User Permissions')
