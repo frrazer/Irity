@@ -1,3 +1,4 @@
+const databaseService = require("../services/databaseService");
 const clearance_levels = {
     DEFAULT: [1, ["DEFAULT"]],
     DJ: [2, ["DJ"]],
@@ -14,16 +15,25 @@ const clearance_levels = {
     OWNER:  [13, [".all"], []]
 };
 
-function calculateClearance(user_id) {
-    // create the method to calculate the clearance using the db
-    // cant do it rn as i dont have the db schema so i will just return 0
-    return true;
+async function calculateClearance(user_id) {
+    const database = await databaseService.getDatabase("DiscordServer");
+    const collection = database.collection("CasinoEmpireLevelling");
+
+    const result = await collection.findOne({ user_id: user_id });
+
+    if (result && result.clearance) {
+        return result.clearance.roles;
+    } else {
+        return "DEFAULT";
+    }
 }
 
-function permissionCheck(user_id, permission) {
-    // create the method to check the permission using the db
-    // cant do it rn as i dont have the db schema so i will just return true
-    return true;
+async function permissionCheck(user_id) {
+    const userClearance = await calculateClearance(user_id);
+    if (!userClearance) return [];
+    
+    const permissions = getPermissions(userClearance);
+    return permissions;
 }
 
 function getPermissions(level) {
@@ -40,7 +50,7 @@ function getPermissions(level) {
     });
   
     return Array.from(allPermissions);
-  }
+}
 
 module.exports = {
     calculateClearance,
