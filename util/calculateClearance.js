@@ -52,8 +52,17 @@ function getPermissions(level) {
     return Array.from(allPermissions);
 }
 
+async function setClearance(user_id, clearance) {
+    const database = await databaseService.getDatabase("DiscordServer");
+    const collection = database.collection("CasinoEmpireLevelling")
+    const result = await collection.updateOne({ user_id: user_id }, { $set: { clearance: { roles: [clearance] } } });
+    return true;
+}
+
+
 module.exports = {
     calculateClearance,
     permissionCheck,
-    getPermissions
+    getPermissions,
+    setClearance
 };
