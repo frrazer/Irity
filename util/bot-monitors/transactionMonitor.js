@@ -216,6 +216,9 @@ async function handleUserNotification(message, transaction, item_name) {
       [_, seller_discord_id] = await getDiscordFromRoblox(
         transaction.seller_id
       );
+
+      console.log("Seller Discord ID:", seller_discord_id);
+
       if (!seller_discord_id) return;
 
       const seller = await user_collection.findOne({

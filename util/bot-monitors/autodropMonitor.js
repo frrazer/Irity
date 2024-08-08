@@ -91,9 +91,7 @@ module.exports = async function (client) {
           embeds: [
             await embeds.successEmbed(
               null,
-              `Dropped **${drop_result.name}**! Next drop in <t:${Math.floor(
-                next.getTime() / 1000
-              )}:R>`,
+              `Dropped **${drop_result.name}**! The next drop has been scheduled.`,
               null,
               false,
               true

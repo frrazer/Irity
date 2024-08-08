@@ -6,6 +6,7 @@ const {
   TextInputStyle,
 } = require("discord.js");
 const { getDatabase } = require("../../services/databaseService");
+const functions = require("../../util/functions");
 
 module.exports = {
   name: "release_item",
@@ -20,6 +21,21 @@ module.exports = {
       );
 
     if (interaction.customId === "release_item") {
+      if (
+        !functions.validateRoles(
+          interaction.member,
+          ["1182048570216546395"],
+          "all"
+        )
+      ) {
+        return embeds.errorEmbed(
+          interaction,
+          "You do not have the required clearance to use this button.",
+          null,
+          true
+        );
+      }
+
       const description = interaction.message.embeds[0].description;
       const name = interaction.message.embeds[0].title;
       const modal = new ModalBuilder()
@@ -104,6 +120,21 @@ module.exports = {
         true
       );
     } else if (interaction.customId === "edit_value") {
+      if (
+        !functions.validateRoles(
+          interaction.member,
+          ["1182048570216546395"],
+          "all"
+        )
+      ) {
+        return embeds.errorEmbed(
+          interaction,
+          "You do not have the required clearance to use this button.",
+          null,
+          true
+        );
+      }
+
       const db = await getDatabase("ArcadeHaven");
       const items = db.collection("items");
 

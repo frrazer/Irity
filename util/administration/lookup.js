@@ -197,17 +197,20 @@ module.exports = {
             .setEmoji("<:unban:1252630527731564666>")
             .setStyle(ButtonStyle.Success);
 
-          if (ban_status.inherited) {
+          if (
+            ban_status.displayReason ==
+            "You created or used an account to avoid an enforcement action taken against another account by the creator of this experience"
+          ) {
             components[0].setDisabled(true);
             embed.setAuthor({
-              name: "This user is an alternate account of a banned user.",
+              name: "This user is an alternate account of a banned user",
               iconURL:
                 "https://cdn.discordapp.com/emojis/1249473498062000209.webp",
             });
           }
         } else if (ban_status === "error") {
           embed.setAuthor({
-            name: "I was unable to check the ban status of this user.",
+            name: "I was unable to check the ban status of this user",
             iconURL:
               "https://cdn.discordapp.com/emojis/1182425203679170600.webp",
           });
@@ -352,7 +355,11 @@ module.exports = {
         const bet = allBets[i];
         historyString += `**${i + 1}.** \`${bet.id}\` (${bet.mode} <t:${
           bet.time
-        }:R>) ${bet.profit > 0 ? "<:green_dot:1264285521476190300>" : "<:grey_dot:1264285450995105823>"}\n`;
+        }:R>) ${
+          bet.profit > 0
+            ? "<:green_dot:1264285521476190300>"
+            : "<:grey_dot:1264285450995105823>"
+        }\n`;
       }
 
       if (historyString === "") {

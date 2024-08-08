@@ -2,26 +2,20 @@ const axios = require("axios");
 const databaseService = require("../services/databaseService");
 
 module.exports = async function (roblox_id) {
-  console.log(`Starting to get Discord ID for Roblox ID: ${roblox_id}`);
   const database = await databaseService.getDatabase("General");
-  console.log("Database connection established.");
   const collection = database.collection("UserIDs");
 
-  const CACHE_DURATION = 24 * 60 * 60 * 1000;
+  const CACHE_DURATION = 24 * 60 * 60 * 1000 * 7; // 1 week
 
   try {
-    console.log(`Checking cache for Roblox ID: ${roblox_id}`);
     const cachedData = await collection.findOne({ RobloxID: roblox_id });
 
     if (
       (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) ||
       cachedData.DontOverwrite
     ) {
-      console.log(`Cache hit for Roblox ID: ${roblox_id}`);
       return [true, cachedData.DiscordID];
     }
-
-    console.log(`Cache miss for Roblox ID: ${roblox_id}. Fetching from API.`);
     const url =
       `https://api.blox.link/v4/public/guilds/932320416989610065/roblox-to-discord/` +
       roblox_id;

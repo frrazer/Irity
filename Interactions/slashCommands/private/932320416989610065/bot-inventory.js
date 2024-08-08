@@ -171,12 +171,10 @@ module.exports = {
     },
 
     async autocomplete(interaction) {
-        console.log(`Autocomplete: ${interaction.options.getFocused()}`)
         const focusedValue = interaction.options.getFocused().toLowerCase();
 
         try {
             const items = await findItems(focusedValue);
-            console.log(items);
 
             const response = items.map((choice) => ({
                 name: `"${choice.name}"`,
