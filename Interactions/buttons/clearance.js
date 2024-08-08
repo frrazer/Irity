@@ -1,28 +1,27 @@
 const embeds = require("../../util/embed");
 
 module.exports = {
-  name: "giveaway-options",
+  name: "clearance",
   aliases: [
-    "gw:prize",
-    "gw:duration",
-    "gw:winner-count",
-    "gw:host",
-    "gw:requirement",
-    "gw:remove-requirement",
+    "clearance-confirm",
+    "clearance-cancel"
   ],
   async execute(interaction, client) {
-    if (interaction.user.id !== interaction.message.interaction.user.id)
+    if (
+      interaction.message.interaction &&
+      interaction.user.id !== interaction.message.interaction.user.id
+    )
       return embeds.errorEmbed(
         interaction,
-        "You cannot use this dropdown.",
+        "You cannot use this button.",
         null,
         true
       );
 
-    const customId = interaction.values[0];
+    const customId = interaction.customId;
 
     try {
-      require(`../../util/giveaways/${customId}.js`).execute(
+      require(`../../util/clearance/button-${customId}.js`).execute(
         interaction,
         client
       );

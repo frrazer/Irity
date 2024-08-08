@@ -11,6 +11,7 @@ const {
 } = require("discord.js");
 const { getThumbnails } = require("noblox.js");
 const { run: getAiMessage } = require("../../util/runAi");
+const clearance = require("../../util/calculateClearance");
 
 module.exports = {
   name: "edit_value",
@@ -69,13 +70,22 @@ module.exports = {
         (current_value === 0 && new_value >= 25000000) ||
         (current_value > 0 && new_value > current_value * 2);
 
+      const clearance_result = await clearance.checkPermission(
+        interaction.member,
+        "EDIT_VALUE"
+      );
+      console.log(clearance_result);
+      if (!clearance_result) {
+        requires_approval = true;
+      }
+
       if (requires_approval) {
         interaction.reply({
           embeds: [
             new EmbedBuilder()
               .setTitle("Value Request Submitted")
               .setDescription(
-                "Because the value you provided is more than double the current value, or the new value is greater than 25,000,000, this request will be sent to the administration team for approval."
+                "Because the value you provided is more than double the current value, the new value is greater than 25,000,000, or you don't have valid clearance, this request will be sent to the administration team for approval."
               )
               .setColor("Blue"),
           ],
