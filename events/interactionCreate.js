@@ -5,11 +5,11 @@ module.exports = {
   once: false,
   async execute(interaction, client) {
     console.log(
-      `${interaction.user.tag} in #${interaction.channel.name} triggered an interaction.`
+      `${interaction.user.tag} in #${interaction.channel.name} triggered an interaction.`,
     );
 
     const isDevMode = process.argv.includes("dev");
-    const developerIds = ["406163086978842625", "733707800345051216"];
+    const developerIds = ["406163086978842625", "733707800345051216", "925875435315806258"];
     if (isDevMode && !developerIds.includes(interaction.user.id)) return;
 
     if (interaction.isCommand() || interaction.isContextMenuCommand())
@@ -27,7 +27,7 @@ async function slashInteraction(interaction, client) {
   const slashCommand = client.slashCommands.get(interaction.commandName);
   if (!slashCommand) {
     return interaction.reply({
-      content: "`An error has occurred.`",
+      content: "An error has occurred.",
       ephemeral: true,
     });
   }
@@ -57,7 +57,7 @@ async function slashInteraction(interaction, client) {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content: "`An error has occurred while executing this command.`",
+      content: "An error has occurred while executing this command.",
       ephemeral: true,
     });
   }
@@ -79,7 +79,7 @@ async function buttonInteraction(interaction, client) {
     );
   if (!button) {
     return interaction.reply({
-      content: "`An error has occurred.`",
+      content: "An error has occurred.",
       ephemeral: true,
     });
   }
@@ -106,7 +106,7 @@ async function buttonInteraction(interaction, client) {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content: "`An error has occurred while executing this command.`",
+      content: "An error has occurred while executing this command.",
       ephemeral: true,
     });
   }
@@ -130,7 +130,7 @@ async function selectMenuInteraction(interaction, client) {
     console.log(interaction.customId)
   if (!selectMenu) {
     return interaction.reply({
-      content: "`An error has occurred.`",
+      content: "An error has occurred.",
       ephemeral: true,
     });
   }
@@ -139,7 +139,7 @@ async function selectMenuInteraction(interaction, client) {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content: "`An error has occurred while executing this command.`",
+      content: "An error has occurred while executing this command.",
       ephemeral: true,
     });
   }
@@ -154,7 +154,7 @@ async function modalInteraction(interaction, client) {
     );
   if (!modal) {
     return interaction.reply({
-      content: "`An error has occurred.`",
+      content: "An error has occurred.",
       ephemeral: true,
     });
   }
@@ -163,7 +163,7 @@ async function modalInteraction(interaction, client) {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content: "`An error has occurred while executing this command.`",
+      content: "An error has occurred while executing this command.",
       ephemeral: true,
     });
   }
