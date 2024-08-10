@@ -120,20 +120,20 @@ module.exports = {
         true
       );
     } else if (interaction.customId === "edit_value") {
-      if (
-        !functions.validateRoles(
-          interaction.member,
-          ["1182048570216546395"],
-          "all"
-        )
-      ) {
-        return embeds.errorEmbed(
-          interaction,
-          "You do not have the required clearance to use this button.",
-          null,
-          true
-        );
-      }
+      // if (
+      //   !functions.validateRoles(
+      //     interaction.member,
+      //     ["1182048570216546395"],
+      //     "all"
+      //   )
+      // ) {
+      //   return embeds.errorEmbed(
+      //     interaction,
+      //     "You do not have the required clearance to use this button.",
+      //     null,
+      //     true
+      //   );
+      // }
 
       const db = await getDatabase("ArcadeHaven");
       const items = db.collection("items");

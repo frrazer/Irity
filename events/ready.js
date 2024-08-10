@@ -21,6 +21,33 @@ const offsaleItemMonitor = require("../util/bot-monitors/offsaleItemMonitor");
 const giveawayMonitor = require("../util/bot-monitors/giveawayMonitor");
 const codeRedeemMonitor = require("../util/bot-monitors/codeRedeemMonitor");
 
+async function extract_details() {
+  const html = (await axios.get("https://www.rolimons.com/itemtable")).data;
+  const startString = "<script>var item_details = ";
+  const endString = ";</script>";
+  const startIndex = html.indexOf(startString);
+  if (startIndex === -1) {
+    return null;
+  }
+  const endIndex = html.indexOf(endString, startIndex);
+  if (endIndex === -1) {
+    return null;
+  }
+  const jsonString = html.substring(startIndex + startString.length, endIndex);
+  const details = JSON.parse(jsonString);
+
+  return details;
+}
+
+function prettifyNumber(number) {
+  // Get the length of the number by converting it to a string
+  const numLength = number.toString().length;
+  const roundingFactor = Math.pow(10, numLength - 2); // -2 to keep 2 significant figures
+  const roundedNumber = Math.round(number / roundingFactor) * roundingFactor;
+
+  return roundedNumber;
+}
+
 module.exports = {
   name: "ready",
   once: true,
@@ -41,10 +68,6 @@ module.exports = {
       ],
       status: "idle",
     });
-
-    const guild = client.guilds.cache.get("932320416989610065");
-    const channel = guild.channels.cache.get("1089320905395667045");
-    // channel.send(`<@&1057310687937953884>`);
 
     usageMonitor(client);
     messageServer(client);

@@ -58,7 +58,7 @@ module.exports = {
           },
         },
         {
-          projection: { projected: 1, name: 1, itemId: 1 },
+          projection: { projected: 1, name: 1, itemId: 1, value: 1 },
         }
       );
 

@@ -5,6 +5,33 @@ const { getDatabase } = require("../services/databaseService");
 const { EmbedBuilder } = require("discord.js");
 const { default: axios } = require("axios");
 
+async function extract_details() {
+  const html = (await axios.get("https://www.rolimons.com/itemtable")).data;
+  const startString = "<script>var item_details = ";
+  const endString = ";</script>";
+  const startIndex = html.indexOf(startString);
+  if (startIndex === -1) {
+    return null;
+  }
+  const endIndex = html.indexOf(endString, startIndex);
+  if (endIndex === -1) {
+    return null;
+  }
+  const jsonString = html.substring(startIndex + startString.length, endIndex);
+  const details = JSON.parse(jsonString);
+
+  return details;
+}
+
+function prettifyNumber(number) {
+  // Get the length of the number by converting it to a string
+  const numLength = number.toString().length;
+  const roundingFactor = Math.pow(10, numLength - 2); // -2 to keep 2 significant figures
+  const roundedNumber = Math.round(number / roundingFactor) * roundingFactor;
+
+  return roundedNumber
+}
+
 module.exports = async function (client, item_id, data, reserve, meta_data) {
   try {
     const database = await getDatabase("ArcadeHaven");
@@ -14,6 +41,11 @@ module.exports = async function (client, item_id, data, reserve, meta_data) {
       await items.deleteOne({ itemId: Number(item_id) });
       return await module.exports(client, item_id, data);
     }
+
+    const details = await extract_details();
+    let item_details = details[item_id];
+    let rap = item_details[8];
+    let value = item_details[16];
 
     const product_info = meta_data || (await getProductInfo(item_id));
     let item_data = {
@@ -30,7 +62,7 @@ module.exports = async function (client, item_id, data, reserve, meta_data) {
       serials: [],
       reselling: {},
       tradeable: false,
-      value: data.value || 0,
+      value: value || (rap ? prettifyNumber(rap) : 0) || 0,
     };
 
     if (reserve && reserve > 0) {
@@ -156,6 +188,7 @@ async function postToRoblox(item_id) {
     });
   } catch (error) {
     console.error("Error posting to Roblox:", error);
+    console.log(error.response.data);
   }
 
   console.log(`Dropped item ${item_id} successfully`);

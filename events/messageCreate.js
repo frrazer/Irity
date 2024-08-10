@@ -57,6 +57,12 @@ module.exports = {
     if (!message.guild) return;
 
     if (message.guild.id === "932320416989610065") {
+      if (message.channel.id === "1271574559312838676") {
+        try {
+          message.react("⭐");
+        } catch (error) {}
+      }
+
       await setupSubscriber();
       const messageData = await getMessageFromStore(message.id);
       if (messageData) {
