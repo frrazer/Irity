@@ -54,9 +54,9 @@ module.exports = async function (client) {
         }
 
         function normalizeString(str) {
-          return str.trim().replace(/\s+/g, " ");
+          return str.trim().replace(/\s+/g, " ").replace(/\r?\n|\r/g, "\n");
         }
-
+        
         const normalizedMessageContent = normalizeString(codes_message.content);
         const normalizedContent = normalizeString(content);
         if (normalizedMessageContent !== normalizedContent) {

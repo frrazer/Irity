@@ -24,7 +24,7 @@ module.exports = async function (client) {
         )
         .toArray();
 
-      const minimum_rate = 0.0001
+      const minimum_rate = 0.65
       for (let listing of listings) {
         const item_data = items_data.find(
           (item) => item.itemId === listing.itemId

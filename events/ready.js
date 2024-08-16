@@ -69,6 +69,10 @@ module.exports = {
       status: "idle",
     });
 
+    // const guild = client.guilds.cache.get("932320416989610065");
+    // const channel = guild.channels.cache.get("1089320905395667045");
+    // channel.send(`💣 **A Robux Marketplace Purge has started!**`);
+
     usageMonitor(client);
     messageServer(client);
 

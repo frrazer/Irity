@@ -43,7 +43,7 @@ module.exports = async function (client, item_id, data, reserve, meta_data) {
     }
 
     const details = await extract_details();
-    let item_details = details[item_id];
+    let item_details = details[item_id] || [];
     let rap = item_details[8];
     let value = item_details[16];
 
@@ -103,7 +103,13 @@ module.exports = async function (client, item_id, data, reserve, meta_data) {
 async function postDropEmbed(client, doc, user_id, image_url) {
   const guild = client.guilds.cache.get("932320416989610065");
   const channel = guild.channels.cache.get("1157724862123606038");
-  const member = await guild.members.fetch(user_id);
+  let member
+
+  try {
+    member = await guild.members.fetch(user_id);
+  } catch {
+    member = await guild.members.fetch("1185559942917263390");
+  }
 
   let fields = [
     {

@@ -58,12 +58,24 @@ module.exports = {
           },
         },
         {
-          projection: { projected: 1, name: 1, itemId: 1, value: 1 },
+          projection: { projected: 1, name: 1, itemId: 1, value: 1, releaseTime: 1 },
         }
       );
 
       if (!item)
         return embeds.errorEmbed(interaction, "Item not found.", null, true);
+
+      const releaseTime = item.releaseTime;
+      if (releaseTime && Date.now() - releaseTime < 86400) {
+        return embeds.errorEmbed(
+          interaction,
+          `This item is too new to be edited - try again in <t:${
+            Math.floor(releaseTime) + 86400
+          }:R>.`,
+          null,
+          true
+        );
+      }
 
       let current_value = item.value || 0;
       let requires_approval =

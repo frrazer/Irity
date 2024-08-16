@@ -87,7 +87,7 @@ module.exports = {
             return embeds.errorEmbed(
               interaction,
               "Something went wrong while dropping the item. (Unique)",
-              null,
+              error.message,
               true
             );
           }
